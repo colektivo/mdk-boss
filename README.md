@@ -1,0 +1,14 @@
+# Mdk-Boss
+
+The Boss will be responsible to make you efficient moving around the museum tracking your time and pointing you how much money are you wasting.
+
+The Boss Node app will be capturing the cards ids from the reader from different locations and store into a database.
+
+To access to the readers is required to have root access so is necessary to run as sudo.
+
+```bash
+
+sudo node boss.js
+
+```
+

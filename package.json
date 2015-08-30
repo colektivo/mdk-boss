@@ -1,0 +1,24 @@
+{
+  "name": "mdk-boss",
+  "version": "1.0.0",
+  "description": "Use HID to access card readers and track the card reading into a db",
+  "main": "boss.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "node-hid": "^0.4.0"
+  },
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "sinon": "^1.16.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "hid"
+  ],
+  "author": "Pedro Visintin",
+  "license": "MIT"
+}
