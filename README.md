@@ -1,3 +1,5 @@
+[![Dependency Status](http://david-dm.org/colektivo/song-song-song.svg)](http://david-dm.org/colektivo/mdk-boss)
+
 # Mdk-Boss
 
 The Boss will be responsible to make you efficient moving around the museum tracking your time and pointing you how much money are you wasting.
