@@ -197,15 +197,16 @@ describe('Device', function () {
   describe('#capture()', function() {
     it('should return the card id based on data events', function () {
       var result;
+      var device = new Device();
       var checkpoint = new Checkpoint({slug: 'entrance', device_path: 'USB_08ff_0009_14541300', order: 1});
       bufferListCard1.map(function(element, index ) {
-        result = Device.capture(element, checkpoint );
+        result = device.capture(element, checkpoint );
       });
       assert.equal('2543714507', result);
 
       var checkpoint = new Checkpoint({slug: 'mid', device_path: 'USB_08ff_0009_14541400', order: 2});
       bufferListCard2.map(function(element, index ) {
-        result = Device.capture(element, checkpoint);
+        result = device.capture(element, checkpoint);
       });
       assert.equal('3504675323', result);
     });
@@ -217,8 +218,9 @@ describe('Device', function () {
   });
   describe('#decode()', function () {
     it('should return the decoded Card id from captured array from reader', function () {
-      assert.equal('2543714507',Device.decode([ 31, 0, 34, 0, 33, 0, 32, 0, 36, 0, 30, 0, 33, 0, 34, 0, 39, 0, 36, 0, 40, 0 ]));
-      assert.equal('3504675323',Device.decode([ 32, 0, 34, 0, 39, 0, 33, 0, 35, 0, 36, 0, 34, 0, 32, 0, 31, 0, 32, 0, 40, 0 ]));
+      var device = new Device();
+      assert.equal('2543714507',device.decode([ 31, 0, 34, 0, 33, 0, 32, 0, 36, 0, 30, 0, 33, 0, 34, 0, 39, 0, 36, 0, 40, 0 ]));
+      assert.equal('3504675323',device.decode([ 32, 0, 34, 0, 39, 0, 33, 0, 35, 0, 36, 0, 34, 0, 32, 0, 31, 0, 32, 0, 40, 0 ]));
     });
   });
 });
