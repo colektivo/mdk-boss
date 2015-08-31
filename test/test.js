@@ -195,6 +195,20 @@ describe('Checkpoint', function () {
 
 describe('Device', function () {
   describe('#capture()', function() {
+    it('should emit read event', function () {
+      var result;
+      var device = new Device();
+      var spy = sinon.spy();
+      var checkpoint = new Checkpoint({slug: 'entrance', device_path: 'USB_08ff_0009_14541300', order: 1});
+      device.on('read', spy);
+      bufferListCard1.map(function(element, index ) {
+        result = device.capture(element, checkpoint );
+      });
+      assert(spy.calledWith('Location:' + checkpoint.slug + ' res:' + result, { for: 'everyone' }));
+    });
+  });
+
+  describe('#capture()', function() {
     it('should return the card id based on data events', function () {
       var result;
       var device = new Device();
@@ -211,11 +225,13 @@ describe('Device', function () {
       assert.equal('3504675323', result);
     });
   });
+
   describe('#handle()', function() {
     it('should contain the device handle', function () {
       
     });
   });
+
   describe('#decode()', function () {
     it('should return the decoded Card id from captured array from reader', function () {
       var device = new Device();
