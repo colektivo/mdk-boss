@@ -14,3 +14,5 @@ sudo node boss.js
 
 ```
 
+Open the browser on http://localhost:3000
+
