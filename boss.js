@@ -18,7 +18,6 @@ io.on('connection', function(socket){
   socket.emit('chat message', 'I\'m tracking you...' );
   entrance.reader.on('read', function(data){ 
     io.emit('chat message', data);
-    console.log(data);
   });
   mid.reader.on('read', function(data){ 
     io.emit('chat message', data);
