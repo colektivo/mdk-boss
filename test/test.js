@@ -19,6 +19,7 @@ var Space = require('./../lib/space.js');
 var Checkpoint = require('./../lib/checkpoint.js');
 var HID = require('node-hid');
 
+// Fixture data, should be located in other file.
 
 var sampleDevices = [ { vendorId: 1452,
     productId: 628,
@@ -127,14 +128,7 @@ var sampleDevices = [ { vendorId: 1452,
     bufferListCard2.push(new Buffer('0000280000000000', 'hex'));
     bufferListCard2.push(new Buffer('0000000000000000', 'hex'));
 
-
-// [ 31, 0, 34, 0, 33, 0, 32, 0, 36, 0, 30, 0, 33, 0, 34, 0, 39, 0, 36, 0, 40, 0 ]
-// 2543 7145 07
-
-// [ 32, 0, 34, 0, 39, 0, 33, 0, 35, 0, 36, 0, 34, 0, 32, 0, 31, 0, 32, 0, 40, 0 ]
-// 3504 6753 23
-    
-
+// end fixture data
 
 describe('Space', function () {
 
@@ -179,6 +173,23 @@ describe('Space', function () {
     //  expect(Space.checkpoints()).to.have.length(0);
     //});
 
+  });
+});
+
+describe('Checkpoint', function () { 
+  describe("#new", function () {
+    it("should remember slug", function () {
+      var checkpoint = new Checkpoint({slug: 'entrance', device_path: 'USB_08ff_0009_14541300', order: 1});
+      assert.equal('entrance', checkpoint.slug);
+    });
+    it("should remember device_path", function () {
+      var checkpoint = new Checkpoint({slug: 'entrance', device_path: 'USB_08ff_0009_14541300', order: 1});
+      assert.equal('USB_08ff_0009_14541300', checkpoint.device_path);
+    });
+    it("should remember order", function () {
+      var checkpoint = new Checkpoint({slug: 'entrance', device_path: 'USB_08ff_0009_14541300', order: 1});
+      assert.equal(1, checkpoint.order);
+    });
   });
 });
 
