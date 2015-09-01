@@ -10,9 +10,16 @@ To access to the readers is required to have root access so is necessary to run 
 
 ```bash
 
+npm install
+
 sudo node boss.js
 
 ```
 
 Open the browser on http://localhost:3000
+
+### TO DO
+
+* namespacing avoiding globals
+* code review by someone with node experience ;-)
 
