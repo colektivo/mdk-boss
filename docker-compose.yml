@@ -1,0 +1,11 @@
+db:
+  image: postgres
+  ports:
+    - "32768:5432"
+  expose:
+    - "5432"
+  environment:
+    POSTGRES_PASSWORD: donald
+    POSTGRES_USER: boss
+  tty:
+    true # dev setting
