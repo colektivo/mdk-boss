@@ -1,4 +1,4 @@
-[![Dependency Status](http://david-dm.org/colektivo/song-song-song.svg)](http://david-dm.org/colektivo/mdk-boss)
+[![Dependency Status](http://david-dm.org/colektivo/mdk-boss.svg)](http://david-dm.org/colektivo/mdk-boss)
 
 # Mdk-Boss
 
