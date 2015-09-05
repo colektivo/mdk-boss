@@ -124,13 +124,13 @@ var sampleDevices = [ { vendorId: 1452,
 describe('Space', function () {
 
   afterEach(function () {
-    HID.devices.restore();
+    Space.devices.restore();
     HID.HID.restore();
   });
   
   beforeEach(function () {
-    sinon.stub(HID, 'devices');
-    sinon.stub(HID, 'HID');
+    sinon.stub(HID,'HID');
+    sinon.stub(Space,'devices').returns(sampleDevices);
   });
 
   describe('#checkpoints', function () {
@@ -145,14 +145,13 @@ describe('Space', function () {
       var hid1 = { on: function (event, callback) {}};
       var hid2 = { on: function (event, callback) {}};
 
-      HID.devices.returns(sampleDevices);
       HID.HID.withArgs('USB_08ff_0009_14541300').returns(hid1);
       HID.HID.withArgs('USB_08ff_0009_14541400').returns(hid2);
 
-      Space.addCheckpoint({slug: 'entrance', device_path: 'USB_08ff_0009_14541300', position: 1});
+      Space.addCheckpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_14541300', position: 1});
       expect(Space.checkpoints()).to.have.length(1);
 
-      Space.addCheckpoint({slug: 'mid', device_path: 'USB_08ff_0009_14541400', position: 2});
+      Space.addCheckpoint({slug: 'mid', devicePath: 'USB_08ff_0009_14541400', position: 2});
       expect(Space.checkpoints()).to.have.length(2);
 
     });
@@ -162,15 +161,15 @@ describe('Space', function () {
 describe('Checkpoint', function () { 
   describe("#new", function () {
     it("should remember slug", function () {
-      var checkpoint = new Checkpoint({slug: 'entrance', device_path: 'USB_08ff_0009_14541300', position: 1});
+      var checkpoint = new Checkpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_14541300', position: 1});
       assert.equal('entrance', checkpoint.slug);
     });
-    it("should remember device_path", function () {
-      var checkpoint = new Checkpoint({slug: 'entrance', device_path: 'USB_08ff_0009_14541300', position: 1});
-      assert.equal('USB_08ff_0009_14541300', checkpoint.device_path);
+    it("should remember devicePath", function () {
+      var checkpoint = new Checkpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_14541300', position: 1});
+      assert.equal('USB_08ff_0009_14541300', checkpoint.devicePath);
     });
     it("should remember the position", function () {
-      var checkpoint = new Checkpoint({slug: 'entrance', device_path: 'USB_08ff_0009_14541300', position: 1});
+      var checkpoint = new Checkpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_14541300', position: 1});
       assert.equal(1, checkpoint.position);
     });
   });
@@ -182,7 +181,7 @@ describe('Device', function () {
       var result;
       var device = new Device();
       var spy = sinon.spy();
-      var checkpoint = new Checkpoint({slug: 'entrance', device_path: 'USB_08ff_0009_14541300', position: 1});
+      var checkpoint = new Checkpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_14541300', position: 1});
       device.on('read', spy);
       bufferListCard1.map(function(element, index ) {
         result = device.capture(element, checkpoint );
@@ -198,13 +197,13 @@ describe('Device', function () {
     it('should return the card id based on data events', function () {
       var result;
       var device = new Device();
-      var checkpoint = new Checkpoint({slug: 'entrance', device_path: 'USB_08ff_0009_14541300', position: 1});
+      var checkpoint = new Checkpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_14541300', position: 1});
       bufferListCard1.map(function(element, index ) {
         result = device.capture(element, checkpoint );
       });
       assert.equal('2543714507', result);
 
-      var checkpoint = new Checkpoint({slug: 'mid', device_path: 'USB_08ff_0009_14541400', position: 2});
+      var checkpoint = new Checkpoint({slug: 'mid', devicePath: 'USB_08ff_0009_14541400', position: 2});
       bufferListCard2.map(function(element, index ) {
         result = device.capture(element, checkpoint);
       });
