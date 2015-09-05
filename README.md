@@ -16,6 +16,8 @@ posgresql
 
 ### Installing on ubuntu
 
+Due that the computer to be installed is not powerful enough to run everything on a VM the configuration was not automated with docker or vagrant.
+
 ```
 git clone https://github.com/colektivo/mdk-boss.git
 
