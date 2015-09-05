@@ -129,6 +129,7 @@ describe('Space', function () {
   });
   
   beforeEach(function () {
+    Space._checkpoints = [];
     sinon.stub(HID,'HID');
     sinon.stub(Space,'devices').returns(sampleDevices);
   });
@@ -149,12 +150,40 @@ describe('Space', function () {
       HID.HID.withArgs('USB_08ff_0009_14541400').returns(hid2);
 
       Space.addCheckpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_14541300', position: 1});
-      expect(Space.checkpoints()).to.have.length(1);
-
       Space.addCheckpoint({slug: 'mid', devicePath: 'USB_08ff_0009_14541400', position: 2});
       expect(Space.checkpoints()).to.have.length(2);
 
     });
+  });
+
+  describe('#isReady', function () {
+
+    it('should know if its ready to start', function () {
+      var hid1 = { on: function (event, callback) {}};
+      var hid2 = { on: function (event, callback) {}};
+
+      HID.HID.withArgs('USB_08ff_0009_14541300').returns(hid1);
+      HID.HID.withArgs('USB_08ff_0009_14541400').returns(hid2);
+
+      Space.addCheckpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_14541300', position: 1});
+      Space.addCheckpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_NOTFOUND', position: 2});
+
+      //expect(Space.checkpoints()).to.have.length(2);
+      expect(Space.isReady()).to.be(false);
+    });
+    it('should add failed checkpoints with up false', function () {
+      var hid1 = { on: function (event, callback) {}};
+      var hid2 = { on: function (event, callback) {}};
+
+      HID.HID.withArgs('USB_08ff_0009_14541300').returns(hid1);
+      HID.HID.withArgs('USB_08ff_0009_14541400').returns(hid2);
+
+      Space.addCheckpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_14541300', position: 1});
+      Space.addCheckpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_NOTFOUND', position: 2});
+
+      expect(Space.checkpoints()).to.have.length(2);
+    });
+
   });
 });
 
