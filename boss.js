@@ -1,3 +1,5 @@
+'use strict';
+
 var Space = require('./lib/space.js');
 var Device = require('./lib/device.js');
 var HID = require('node-hid');
@@ -36,4 +38,5 @@ io.on('connection', function(socket){
 http.listen(3000, function(){
   console.log('listening on *:3000');
 });
+
 
