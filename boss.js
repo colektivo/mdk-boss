@@ -27,10 +27,14 @@ if (Space.isReady()) {
 
   io.on('connection', function(socket){
     socket.emit('chat message', 'I\'m tracking you...' );
+    var lastPosition = Space.lastPosition();
     for (var i = 0; i < Space._checkpoints.length; i++) {
       Space._checkpoints[i].reader.on('read', function(data){
         Checking.read(data.checkpoint, data.id);
         io.emit('chat message', data.checkpoint.position + ':' + data.id );
+        if (data.checkpoint.position == lastPosition) {
+          io.emit('chat message', 'Show starts for: ' + data.id  );
+        }
       });
     }
   });
