@@ -32,3 +32,6 @@ node_modules
 
 # Mac related files
 .DS_Store
+
+# Database Config File
+config/config.json

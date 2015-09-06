@@ -1,0 +1,27 @@
+{
+  "development": {
+    "username": "user",
+    "password": "password",
+    "database": "boss_development",
+    "host": "192.168.99.100",
+    "port": 32768,
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "user",
+    "password": "password",
+    "database": "boss_test",
+    "host": "192.168.99.100",
+    "port": 32768,
+    "dialect": "postgres"
+  },
+  # production db for this project uses pg in localhost 
+  "production": {
+    "username": "user",
+    "password": "password",
+    "database": "boss_production",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres"
+  }
+}
