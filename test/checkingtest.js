@@ -19,8 +19,7 @@ describe('Checking', function() {
   describe('#new', function () {
 
     it('should persist the visitorTrack', function () {
-      var checkpoint = { 
-        slug: 'test', 
+      var checkpoint = {
         position: 4
       }
       var spy = sinon.spy(models.VisitorTrack, "create");

@@ -68,7 +68,7 @@ var sampleDevices = [ { vendorId: 1452,
     product: 'SYC ID&IC USB Reader',
     release: 8,
     interface: -1 } ]
-    
+
 
     var bufferListCard1 = [];
     bufferListCard1.push(new Buffer('00001f0000000000', 'hex'));
@@ -119,6 +119,22 @@ var sampleDevices = [ { vendorId: 1452,
     bufferListCard2.push(new Buffer('0000280000000000', 'hex'));
     bufferListCard2.push(new Buffer('0000000000000000', 'hex'));
 
+var sampleDecicesConfig = {
+  "entrance": {
+    "devicePath": "USB_08ff_0009_14541000",
+    "position": 1
+  },
+  "hall": {
+    "devicePath": "USB_08ff_0009_14541400",
+    "position": 2
+  },
+  "exit": {
+    "devicePath": "USB_08ff_0009_14541400",
+    "position": 3
+  }
+};
+
+
 // end fixture data
 
 describe('Space', function () {
@@ -127,7 +143,7 @@ describe('Space', function () {
     Space.devices.restore();
     HID.HID.restore();
   });
-  
+
   beforeEach(function () {
     Space._checkpoints = [];
     sinon.stub(HID,'HID');
@@ -149,8 +165,8 @@ describe('Space', function () {
       HID.HID.withArgs('USB_08ff_0009_14541300').returns(hid1);
       HID.HID.withArgs('USB_08ff_0009_14541400').returns(hid2);
 
-      Space.addCheckpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_14541300', position: 1});
-      Space.addCheckpoint({slug: 'mid', devicePath: 'USB_08ff_0009_14541400', position: 2});
+      Space.addCheckpoint(sampleDecicesConfig.entrance);
+      Space.addCheckpoint(sampleDecicesConfig.exit);
       expect(Space.checkpoints()).to.have.length(2);
 
     });
@@ -165,8 +181,8 @@ describe('Space', function () {
       HID.HID.withArgs('USB_08ff_0009_14541300').returns(hid1);
       HID.HID.withArgs('USB_08ff_0009_14541400').returns(hid2);
 
-      Space.addCheckpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_14541300', position: 1});
-      Space.addCheckpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_NOTFOUND', position: 2});
+      Space.addCheckpoint(sampleDecicesConfig.entrance);
+      Space.addCheckpoint(sampleDecicesConfig.exit);
 
       //expect(Space.checkpoints()).to.have.length(2);
       expect(Space.isReady()).to.be(false);
@@ -178,8 +194,8 @@ describe('Space', function () {
       HID.HID.withArgs('USB_08ff_0009_14541300').returns(hid1);
       HID.HID.withArgs('USB_08ff_0009_14541400').returns(hid2);
 
-      Space.addCheckpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_14541300', position: 1});
-      Space.addCheckpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_NOTFOUND', position: 2});
+      Space.addCheckpoint(sampleDecicesConfig.entrance);
+      Space.addCheckpoint(sampleDecicesConfig.exit);
 
       expect(Space.checkpoints()).to.have.length(2);
     });
@@ -187,19 +203,15 @@ describe('Space', function () {
   });
 });
 
-describe('Checkpoint', function () { 
+describe('Checkpoint', function () {
   describe("#new", function () {
-    it("should remember slug", function () {
-      var checkpoint = new Checkpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_14541300', position: 1});
-      assert.equal('entrance', checkpoint.slug);
-    });
     it("should remember devicePath", function () {
-      var checkpoint = new Checkpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_14541300', position: 1});
-      assert.equal('USB_08ff_0009_14541300', checkpoint.devicePath);
+      var checkpoint = new Checkpoint(sampleDecicesConfig.entrance);
+      assert.equal(sampleDecicesConfig.entrance.devicePath, checkpoint.devicePath);
     });
     it("should remember the position", function () {
-      var checkpoint = new Checkpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_14541300', position: 1});
-      assert.equal(1, checkpoint.position);
+      var checkpoint = new Checkpoint(sampleDecicesConfig.hall);
+      assert.equal(2, checkpoint.position);
     });
   });
 });
@@ -217,7 +229,7 @@ describe('Device', function () {
       });
       assert(spy.calledWith({
         checkpoint: checkpoint,
-        id: result}, 
+        id: result},
         { for: 'everyone' }));
     });
   });
@@ -248,4 +260,3 @@ describe('Device', function () {
     });
   });
 });
-
