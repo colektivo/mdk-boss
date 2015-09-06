@@ -36,7 +36,35 @@ sudo apt-get install postgresql-client
 
 ```
 
-# usage
+### configuration
+
+There are 2 configuration files: /config/config.json for the database, a sample file is provided as config.samle. Update the parameters according to your db configuration and save as config.json.
+
+#### Configure the devices
+
+The second configuration file is /config/devices.json and a devices.sample is provided, is very important to have one entry per device and update the devicePath according the current path. The position is very important to do the time tracking where 1 is the first, 2 is the 2nd, and so...
+The name like "entrance" is arbitrary is just to associate to a real location in the code. The lowest position will be considered as the first checking point, and the highest will be the final.
+
+```
+{
+  { "entrance": {
+    "devicePath": "123:123:123",
+    "position": 1
+  },
+  { "hall": {
+    "devicePath": "456:456:456",
+    "position": 2
+  },
+  ...  
+  { "exit": {
+    "devicePath": "999:999:999",
+    "position": 7
+  }
+}
+
+```
+
+## usage
 
 To access to the readers is required to have root access so is necessary to run as sudo.
 
@@ -54,4 +82,3 @@ Open the browser on http://localhost:3000
 
 * namespacing avoiding globals
 * code review by someone with node experience ;-)
-
