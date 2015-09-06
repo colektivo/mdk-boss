@@ -125,7 +125,7 @@ var sampleDecicesConfig = {
     "position": 1
   },
   "hall": {
-    "devicePath": "USB_08ff_0009_14541400",
+    "devicePath": "USB_08ff_0009_14541700",
     "position": 2
   },
   "exit": {
@@ -168,6 +168,26 @@ describe('Space', function () {
       Space.addCheckpoint(sampleDecicesConfig.entrance);
       Space.addCheckpoint(sampleDecicesConfig.exit);
       expect(Space.checkpoints()).to.have.length(2);
+
+    });
+  });
+
+  describe('#lastPosition', function () {
+
+    it('should know the last position on the space', function () {
+      var hid1 = { on: function (event, callback) {}};
+      var hid2 = { on: function (event, callback) {}};
+      var hid3 = { on: function (event, callback) {}};
+
+      HID.HID.withArgs('USB_08ff_0009_14541300').returns(hid1);
+      HID.HID.withArgs('USB_08ff_0009_14541700').returns(hid2);
+      HID.HID.withArgs('USB_08ff_0009_14541400').returns(hid3);
+
+      Space.addCheckpoint(sampleDecicesConfig.entrance);
+      Space.addCheckpoint(sampleDecicesConfig.hall);
+      Space.addCheckpoint(sampleDecicesConfig.exit);
+
+      expect(Space.lastPosition()).to.eql(3);
 
     });
   });
