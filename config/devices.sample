@@ -1,0 +1,35 @@
+{
+  "development": {
+    "entrance": {
+      "devicePath": "USB_08ff_0009_14541000",
+      "position": 1
+    },
+
+    "hall": {
+      "devicePath": "USB_08ff_0009_14541400",
+      "position": 2
+    },
+
+    "exit": {
+      "devicePath": "USB_08ff_0009_14541400",
+      "position": 3
+    }
+  },
+  "production": {
+    "entrance": {
+      "devicePath": "USB_08ff_0009_14541000",
+      "position": 1
+    },
+
+    "hall": {
+      "devicePath": "USB_08ff_0009_14541400",
+      "position": 2
+    },
+
+    "exit": {
+      "devicePath": "USB_08ff_0009_14541400",
+      "position": 3
+    }
+  }
+
+}
