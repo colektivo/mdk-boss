@@ -10,7 +10,7 @@ var http      = require('http').Server(app);
 var io        = require('socket.io')(http);
 
 var env       = process.env.NODE_ENV || 'development';
-var devices   = require(__dirname + '/config/checkpoints.json')[env];
+var devices   = require(__dirname + '/config/devices.json')[env];
 
 /*
 As the devicePath change every time this should be reconfigured everytime, maybe a config file and a setup cli command will be a good idea
@@ -27,20 +27,13 @@ if (Space.isReady()) {
 
   io.on('connection', function(socket){
     socket.emit('chat message', 'I\'m tracking you...' );
-    entrance.reader.on('read', function(data){
-      Checking.read(data.checkpoint, data.id);
-      io.emit('chat message', data.checkpoint.position + ':' + data.id );
-    });
-    mid.reader.on('read', function(data){
-      Checking.read(data.checkpoint, data.id);
-      io.emit('chat message', data.checkpoint.position + ':' + data.id );
-    });
-    last.reader.on('read', function(data){
-      Checking.read(data.checkpoint, data.id);
-      io.emit('chat message', data.checkpoint.position + ':' + data.id );
-    });
+    for (var i = 0; i < Space._checkpoints.length; i++) {
+      Space._checkpoints[i].reader.on('read', function(data){
+        Checking.read(data.checkpoint, data.id);
+        io.emit('chat message', data.checkpoint.position + ':' + data.id );
+      });
+    }
   });
-
 
   http.listen(3000, function(){
     console.log('listening on *:3000');
