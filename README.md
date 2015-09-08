@@ -80,5 +80,6 @@ Open the browser on http://localhost:3000
 
 ### TO DO
 
-* namespacing avoiding globals
+* namespacing avoiding globals in some cases
+* move from assert to chai to have consistency and nicer readability of the tests 
 * code review by someone with node experience ;-)
