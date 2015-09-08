@@ -3,12 +3,12 @@
 var chai = require('chai')
   , expect = chai.expect
   , should = chai.should()
-  , assert = chai.assert;
-var sinon = require('sinon');
-var Sequelize = require('sequelize');
-var Promise = Sequelize.Promise
+  , assert = chai.assert
+  , sinon = require('sinon')
+  , Sequelize = require('sequelize')
+  , Promise = Sequelize.Promise
+  , moment = require('moment');
 
-var moment = require('moment');
 var Payment = require('./../lib/representers/payment.js');
 var models  = require('../models');
 
@@ -65,8 +65,6 @@ var cards = [
   'payment14510',
   'payment14511'
 ]
-
-var deletePromise = models.VisitorTrack.truncate();
 
 describe('Payment', function() {
   var promise;
