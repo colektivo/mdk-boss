@@ -5,10 +5,10 @@ var expect = require('expect.js');
 var sinon = require('sinon');
 
 var moment = require('moment');
-var Checking = require('./../lib/operations/checking.js');
+var Checking = require('./../lib/operations/checkin.js');
 var models  = require('../models');
 
-describe('Checking', function() {
+describe('Checkin', function() {
   beforeEach(function () {
     this.clock = sinon.useFakeTimers(new Date(2014,8,1,10,1,1,0).getTime());
   }),
@@ -30,11 +30,3 @@ describe('Checking', function() {
 
   });
 });
-
-/*
-User.create({
-  username: 'john-doe',
-  password: generatePasswordHash('i-am-so-great')
-}).then(function(user) {
-})
-*/

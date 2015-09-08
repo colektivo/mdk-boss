@@ -3,7 +3,7 @@
 var Space     = require('./lib/space.js');
 var Device    = require('./lib/device.js');
 var HID       = require('node-hid');
-var Checking  = require('./lib/operations/checking.js');
+var Checking  = require('./lib/operations/checkin.js');
 
 var app       = require('express')();
 var http      = require('http').Server(app);

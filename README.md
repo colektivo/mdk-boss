@@ -43,7 +43,7 @@ There are 2 configuration files: /config/config.json for the database, a sample 
 #### Configure the devices
 
 The second configuration file is /config/devices.json and a devices.sample is provided, is very important to have one entry per device and update the devicePath according the current path. The position is very important to do the time tracking where 1 is the first, 2 is the 2nd, and so...
-The name like "entrance" is arbitrary is just to associate to a real location in the code. The lowest position will be considered as the first checking point, and the highest will be the final.
+The name like "entrance" is arbitrary is just to associate to a real location in the code. The lowest position will be considered as the first check-in point, and the highest will be the final.
 
 ```
 {
@@ -81,5 +81,5 @@ Open the browser on http://localhost:3000
 ### TO DO
 
 * namespacing avoiding globals in some cases
-* move from assert to chai to have consistency and nicer readability of the tests 
+* move from assert to chai to have consistency and nicer readability of the tests
 * code review by someone with node experience ;-)
