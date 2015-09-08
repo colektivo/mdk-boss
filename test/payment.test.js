@@ -54,7 +54,7 @@ var visitors = [
   [
     {time: '7:31:02', position: 1},
     {time: '10:00:12', position: 6}
-  ],
+  ]
 
 ]
 
