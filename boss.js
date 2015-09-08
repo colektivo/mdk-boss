@@ -19,6 +19,7 @@ As the devicePath change every time this should be reconfigured everytime, maybe
 var entrance = Space.addCheckpoint(devices.entrance);
 var mid = Space.addCheckpoint(devices.hall);
 var last = Space.addCheckpoint(devices.exit);
+var Payment = require('./lib/representers/payment.js');
 
 if (Space.isReady()) {
   app.get('/', function(req, res){
@@ -26,15 +27,22 @@ if (Space.isReady()) {
   });
 
   io.on('connection', function(socket){
-    socket.emit('chat message', 'I\'m tracking you...' );
+    socket.emit('hello', { message: 'I\'m tracking you...' });
     var lastPosition = Space.lastPosition();
-    for (var i = 0; i < Space._checkpoints.length; i++) {
+    var totalDevices = Space._checkpoints.length;
+
+    for (var i = 0; i < totalDevices; i++) {
       Space._checkpoints[i].reader.on('read', function(data){
-        Checking.read(data.checkpoint, data.id);
-        io.emit('chat message', data.checkpoint.position + ':' + data.id );
-        if (data.checkpoint.position == lastPosition) {
-          io.emit('chat message', 'Show starts for: ' + data.id  );
-        }
+        Checking.read(data.checkpoint, data.id)
+          .then(function(){
+          socket.emit('check', { position: data.checkpoint.position, cardId: data.id } );
+          if (data.checkpoint.position == lastPosition) {
+            Payment.compute(data.id, totalDevices, function(data){
+              socket.emit('completed', { text: 'Gotcha!'} );
+              socket.emit('completed', data);
+            });
+          }
+        });
       });
     }
   });
