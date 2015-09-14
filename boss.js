@@ -7,7 +7,7 @@ var Checking  = require('./lib/operations/checkin.js');
 
 var app       = require('express')();
 var http      = require('http').Server(app);
-var io        = require('socket.io')(http);
+var io        = require('socket.io')(8001);
 
 var env       = process.env.NODE_ENV || 'development';
 var devices   = require(__dirname + '/config/devices.json')[env];
@@ -37,7 +37,7 @@ if (Space.isReady()) {
           .then(function(){
           socket.emit('check', { position: data.checkpoint.position, cardId: data.id } );
           if (data.checkpoint.position == lastPosition) {
-            Payment.compute(data.id, totalDevices, function(data){
+            Payment.compute(data.id, totalDevices).then( function(data){
               socket.emit('completed', { text: 'Gotcha!'} );
               socket.emit('completed', data);
             });
