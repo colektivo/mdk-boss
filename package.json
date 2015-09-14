@@ -18,6 +18,8 @@
   },
   "devDependencies": {
     "chai": "*",
+    "chai-as-promised": "^5.1.0",
+    "chai-subset": "^1.1.0",
     "mocha": "*",
     "sinon": "^1.16.1"
   },

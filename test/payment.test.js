@@ -3,371 +3,628 @@
 var chai = require('chai')
   , expect = chai.expect
   , should = chai.should()
-  , assert = chai.assert
+  //, assert = chai.assert
   , sinon = require('sinon')
   , Sequelize = require('sequelize')
   , Promise = Sequelize.Promise
-  , moment = require('moment');
+  , moment = require('moment')
+  , chaiAsPromised = require("chai-as-promised")
+  , chaiSubset = require('chai-subset');
+
+chai.use(chaiAsPromised);
+chai.use(chaiSubset);
 
 var Payment = require('./../lib/representers/payment.js');
 var models  = require('../models');
+var numOfDevices = 6;
 
-var visitors = [
-  [
-    {time: '1:00:00', position: 1},
-    {time: '1:10:01', position: 2},
-    {time: '1:50:33', position: 3},
-    {time: '2:05:48', position: 4},
-    {time: '2:17:56', position: 5},
-    {time: '2:22:22', position: 6}
-  ],
-  [
-    {time: '3:05:00', position: 1},
-    {time: '3:11:22', position: 2},
-    {time: '3:51:11', position: 3},
-    {time: '4:00:12', position: 6}
-  ],
-  [
-    {time: '4:31:02', position: 1},
-    {time: '6:00:12', position: 6}
-  ],
-  [
-    {time: '5:10:23', position: 1}
-  ],
-  [
-    {time: '6:10:23', position: 6}
-  ],
-  [
-    {time: '7:00:00', position: 1},
-    {time: '7:10:01', position: 2},
-    {time: '7:50:33', position: 3},
-    {time: '8:05:48', position: 4},
-    {time: '8:17:56', position: 5},
-    {time: '8:44:44', position: 6}
-  ],
-  [
-    {time: '7:05:00', position: 1},
-    {time: '7:11:22', position: 2},
-    {time: '7:51:11', position: 3},
-    {time: '8:00:12', position: 6}
-  ],
-  [
-    {time: '7:31:02', position: 1},
-    {time: '10:00:12', position: 6}
-  ]
+/*
 
-]
+  helper functions
+  createTracks(cardId, array of arrays) create the tracks for the cardId based on the array provided
+  addTimeBetweenDevices() add default time between devices
+  addTimeBetweenVisitors() add default time between visitors
 
-var cards = [
-  'payment14507',
-  'payment14508',
-  'payment14509',
-  'payment14510',
-  'payment14511'
-]
+*/
 
-describe('Payment', function() {
+function addTimeBetweenDevices(timestamp) {
+  return moment(timestamp).add(30,'minutes').add(2,'seconds').utc().toDate();
+}
+
+function addTimeBetweenVisitors(timestamp) {
+  return moment(timestamp).add(3,'hours').utc().toDate();
+}
+
+function createTracks(cardId, startDate , tracksData) {
+  var visitorRecords = [];
+  var currentTimestamp = startDate;
+  // create the data set with default dates
+  for (var i = 0; i < tracksData.length; i++) {
+    var trackRecords = [];
+    for (var j = 0; j < tracksData[i].length; j++) {
+      var record = {card_id: cardId, position: tracksData[i][j], created_at: currentTimestamp};
+      trackRecords.push(record);
+      console.log(record);
+      currentTimestamp = addTimeBetweenDevices(currentTimestamp);
+    }
+    visitorRecords = visitorRecords.concat(trackRecords);
+    currentTimestamp = addTimeBetweenVisitors(currentTimestamp);
+  }
+  return visitorRecords;
+}
+
+var defaultTimestamp = moment([2023, 3, 3, 0, 0, 0, 0]).utc().toDate();
+
+describe.only('Payment', function() {
   var promise;
 
   before(function () {
+
+    // complete
+    var nicevisitorcomplete = createTracks("nicevisitorcomplete", defaultTimestamp, [ [1,6], [1,2,3,4,5,6] ] );
+    var dumbvisitorcomplete = createTracks("dumbvisitorcomplete", defaultTimestamp, [ [1,6], [1,2,3,3,4,5,6]  ] );
+    var reversecomplete = createTracks("reversecomplete", defaultTimestamp, [ [6,5,4,3,2,1],[1,2,3,4,5,6]] );
+    var noprevactivitycomplete = createTracks("noprevactivitycomplete", defaultTimestamp, [ [1], [1], [1,1,2,3,4,5,6]  ] );
+
+    // valid
+    var onesix3valid = createTracks("onesix3valid", defaultTimestamp, [ [1,2,3,6],[1,1,1,6,6,6]] );
+    var double12valid = createTracks("double12valid", defaultTimestamp, [ [1,2,3,4,5,6], [1,1,2,2,3,6]] );
+    var pure666valid = createTracks("pure666valid", defaultTimestamp, [ [1,2,3,4,5], [1,6,6,6]] );
+    var drunkvalid = createTracks("drunkvalid", defaultTimestamp, [ [1,2,3,4,5,6], [1,2,2,3,3,4,3,2,2,6] ] );
+
+    // invalid
+    var only6 = createTracks("only6", defaultTimestamp, [ [1,2,3,4,5,6], [6]] );
+    var only1only6 = createTracks("only1only6", defaultTimestamp, [ [1], [6]] );
+    var only666 = createTracks("only666only6", defaultTimestamp, [ [6,6,6], [6]] );
+    var check26 = createTracks("check26", defaultTimestamp, [ [1,2,3,4,5,6],[2,6]] );
+    var reverse6 = createTracks("reverse6", defaultTimestamp, [ [1,2,3,4,5,6], [6,5,4,3,2,1], [6]] );
+    var just61 = createTracks("just61", defaultTimestamp, [ [1,2,3,4,5,6],[6],[1]  ] );
+    var just11 = createTracks("just11", defaultTimestamp, [ [1,2,3,4,5,6],[1],[1]  ] );
+    var just22 = createTracks("just22", defaultTimestamp, [ [1,2,3,4,5,6],[2],[2]  ] );
+    var just33 = createTracks("just33", defaultTimestamp, [ [1,2,3,4,5,6],[3],[3]  ] );
+
     return promise = models.VisitorTrack.truncate()
       .then(function(){
-        var currentCardId = 0;
-        var cardId;
-
-        var tracks = visitors.map(function(tracks, index, visitors){
-          cardId = cards[currentCardId ++ % cards.length];
-          var maybe = tracks.map(function(track, index, tracks) {
-            var ok,
-                time,
-                hour,
-                min,
-                sec,
-                clock,
-                visitorTrack
-            time = track.time.split(':');
-            hour = time[0];
-            min = time[1];
-            sec = time[2];
-            ok = moment([2023, 3, 3, hour, min, sec, 0]).utc().toDate();
-            return {cardId: cardId, position: track.position, createdAt: ok};
-          });
-          return maybe;
-        }).reduce(function(a, b) {
-          return a.concat(b);
-        });
-
+        var tracks = only6.concat(only1only6
+                                  , only666
+                                  , check26
+                                  , reverse6
+                                  , reversecomplete
+                                  , pure666valid
+                                  , onesix3valid
+                                  , double12valid
+                                  , drunkvalid
+                                  , nicevisitorcomplete
+                                  , dumbvisitorcomplete
+                                  , noprevactivitycomplete);
         return models.VisitorTrack.bulkCreate(tracks);
-
       });
-
   }),
 
   afterEach(function () {
   }),
+
   describe('#compute', function () {
-    var numOfDevices = 6;
 
-    it('should compute the hours spent by the visitor', function () {
-      var cardId = "payment14507";
-      var computedPayment = Payment.compute(
-        cardId,
-        numOfDevices,
-        function(computedPayment){
-          return expect(1).to.eql(computedPayment.workingTime.hours );
-        }
-      );
-      var cardId = "payment14508";
-      var computedPayment = Payment.compute(
-        cardId,
-        numOfDevices,
-        function(computedPayment){
-          return expect(0).to.eql(computedPayment.workingTime.hours );
-        }
-      );
-      var cardId = "payment14509";
-      var computedPayment = Payment.compute(
-        cardId,
-        numOfDevices,
-        function(computedPayment){
-          return expect(2).to.eql(computedPayment.workingTime.hours );
-        }
-      );
-
-    });
-
-    it('should compute the minutes spent by the visitor', function () {
-      var cardId = "payment14507";
-      var computedPayment = Payment.compute(
-        cardId,
-        numOfDevices,
-        function(computedPayment){
-          expect(44).to.eql(computedPayment.workingTime.minutes );
-        }
-      );
-      var cardId = "payment14508";
-      var computedPayment = Payment.compute(
-        cardId,
-        numOfDevices,
-        function(computedPayment){
-          expect(55).to.eql(computedPayment.workingTime.minutes );
-        }
-      );
-      var cardId = "payment14509";
-      var computedPayment = Payment.compute(
-        cardId,
-        numOfDevices,
-        function(computedPayment){
-          expect(29).to.eql(computedPayment.workingTime.minutes );
-        }
-      );
-
-    });
-
-    it('should compute the seconds spent by the visitor', function () {
-      var cardId = "payment14508";
-      var computedPayment = Payment.compute(
-        cardId,
-        numOfDevices,
-        function(computedPayment){
-          expect(12).to.eql(computedPayment.workingTime.seconds );
-        }
-      );
-      var cardId = "payment14509";
-      var computedPayment = Payment.compute(
-        cardId,
-        numOfDevices,
-        function(computedPayment){
-          expect(10).to.eql(computedPayment.workingTime.seconds );
-        }
-      );
-    });
-
-    it('should compute the decimalTime spent by the visitor', function () {
-
-      var cardId = "payment14507";
-      var computedPayment = Payment.compute(
-        cardId,
-        numOfDevices,
-        function(computedPayment){
-          expect(1 + 44 / 60).to.eql(computedPayment.workingTime.decimalTime );
-        }
-      );
-
-      var cardId = "payment14508";
-      var computedPayment = Payment.compute(
-        cardId,
-        numOfDevices,
-        function(computedPayment){
-          expect(55 / 60).to.eql(computedPayment.workingTime.decimalTime );
-        }
-      );
-
-    });
-
-    describe('computing the time spent in each room by visitor', function () {
-
-      describe('depending on how many checkpoints the visitor checked', function () {
-
-        describe('with a visitor that checked everywhere', function () {
-
-          it('should return all the check-ins from the user', function () {
-
-            var cardId = "payment14507";
-            var computedPayment = Payment.compute(
-              cardId,
-              numOfDevices,
-              function(computedPayment){
-                var computedResult = computedPayment;
-                computedResult.timeReport[0].position.should.equal(1);
-                computedResult.timeReport[1].position.should.equal(2);
-                computedResult.timeReport[2].position.should.equal(3);
-                computedResult.timeReport[3].position.should.equal(4);
-                computedResult.timeReport[4].position.should.equal(5);
-                computedResult.timeReport[5].position.should.equal(6);
-              }
-            );
-
-          });
-          it('should return the time spent in each checkpoint', function () {
-            var cardId = "payment14507";
-            var computedPayment = Payment.compute(
-              cardId,
-              numOfDevices,
-              function(computedPayment){
-                var computedResult = computedPayment;
-
-                computedResult.timeReport[0].timeElapsed.hours.should.equal(0);
-                computedResult.timeReport[0].timeElapsed.minutes.should.equal(10);
-                computedResult.timeReport[0].timeElapsed.seconds.should.equal(1);
-
-                computedResult.timeReport[1].timeElapsed.hours.should.equal(0);
-                computedResult.timeReport[1].timeElapsed.minutes.should.equal(40);
-                computedResult.timeReport[1].timeElapsed.seconds.should.equal(32);
-
-                computedResult.timeReport[2].timeElapsed.hours.should.equal(0);
-                computedResult.timeReport[2].timeElapsed.minutes.should.equal(15);
-                computedResult.timeReport[2].timeElapsed.seconds.should.equal(15);
-
-                computedResult.timeReport[3].timeElapsed.hours.should.equal(0);
-                computedResult.timeReport[3].timeElapsed.minutes.should.equal(12);
-                computedResult.timeReport[3].timeElapsed.seconds.should.equal(8);
-
-                computedResult.timeReport[4].timeElapsed.hours.should.equal(0);
-                computedResult.timeReport[4].timeElapsed.minutes.should.equal(26);
-                computedResult.timeReport[4].timeElapsed.seconds.should.equal(48);
-
-                computedResult.timeReport[5].timeElapsed.hours.should.equal(0);
-                computedResult.timeReport[5].timeElapsed.minutes.should.equal(0);
-                computedResult.timeReport[5].timeElapsed.seconds.should.equal(0);
-
-              }
-            );
-
-          });
+    // check26
+    describe('when visitor only check the 2nd and the latest', function(){
+      var payment;
+      before(function(done){
+        var promise = Payment.compute(
+          "check26",
+          numOfDevices
+        );
+        promise.then(function(result){
+          payment = result;
+          done();
         });
-
-        describe('with a visitor that checked in some of the checkpoints', function () {
-
-          it('should be valid', function () {
-            var cardId = "payment14508";
-            var computedPayment = Payment.compute(
-              cardId,
-              numOfDevices,
-              function(computedPayment){
-                var computedResult = computedPayment;
-                computedResult.isValid.should.be.true;
-              }
-            );
-          });
-
-          it('should return a partial list of the check-ins', function () {
-            var cardId = "payment14508";
-            var computedPayment = Payment.compute(
-              cardId,
-              numOfDevices,
-              function(computedPayment){
-                var computedResult = computedPayment;
-                computedResult.timeReport[0].position.should.equal(1);
-                computedResult.timeReport[1].position.should.equal(2);
-                computedResult.timeReport[2].position.should.equal(3);
-                computedResult.timeReport[3].position.should.equal(6);
-              }
-            );
-
-          });
-
-        });
-
-        describe('with a visitor that checked only at the begining and at the end', function () {
-          it('should be valid', function () {
-            var cardId = "payment14509";
-            var computedPayment = Payment.compute(
-              cardId,
-              numOfDevices,
-              function(computedPayment){
-                var computedResult = computedPayment;
-                computedResult.isValid.should.be.true;
-              }
-            );
-          });
-
-          it('should return the total of the first checkpoint as the grand total', function () {
-
-            var cardId = "payment14509";
-            var computedPayment = Payment.compute(
-              cardId,
-              numOfDevices,
-              function(computedPayment){
-                var computedResult = computedPayment;
-
-                computedResult.timeReport[0].timeElapsed.hours.should.equal(2);
-                computedResult.timeReport[0].timeElapsed.minutes.should.equal(29);
-                computedResult.timeReport[0].timeElapsed.seconds.should.equal(10);
-
-                computedResult.timeReport[1].timeElapsed.hours.should.equal(0);
-                computedResult.timeReport[1].timeElapsed.minutes.should.equal(0);
-                computedResult.timeReport[1].timeElapsed.seconds.should.equal(0);
-
-              }
-            );
-
-          });
-        });
-
-        describe('with a visitor that checked only at the begining', function () {
-          it('should not be valid', function () {
-            var cardId = "payment14510";
-            var computedPayment = Payment.compute(
-              cardId,
-              numOfDevices,
-              function(computedPayment){
-                var computedResult = computedPayment;
-                computedResult.isValid.should.be.false;
-              }
-            );
-          });
-          it('should return the total of the first checkpoint as the grand total', function () {
-
-            var cardId = "payment14510";
-            var computedPayment = Payment.compute(
-              cardId,
-              numOfDevices,
-              function(computedPayment){
-                var computedResult = computedPayment;
-
-                computedResult.timeReport[0].timeElapsed.hours.should.equal(0);
-                computedResult.timeReport[0].timeElapsed.minutes.should.equal(0);
-                computedResult.timeReport[0].timeElapsed.seconds.should.equal(0);
-
-              }
-            );
-
-          });
-        });
-
+      });
+      it('Should be valid', function(){
+        payment.should.have.property('isValid', false);
       });
     });
+
+    // just33
+    describe('when last visitor only check the 3rd and previous visitor only check the 3rd', function(){
+      var payment;
+      before(function(done){
+        var promise = Payment.compute(
+          "just33",
+          numOfDevices
+        );
+        promise.then(function(result){
+          payment = result;
+          done();
+        });
+      });
+      it('Should be valid', function(){
+        payment.should.have.property('isValid', false);
+      });
+    });
+
+
+
+    // just22
+    describe('when last visitor only check the 2nd and previous visitor only check the 2nd', function(){
+      var payment;
+      before(function(done){
+        var promise = Payment.compute(
+          "just22",
+          numOfDevices
+        );
+        promise.then(function(result){
+          payment = result;
+          done();
+        });
+      });
+      it('Should be valid', function(){
+        payment.should.have.property('isValid', false);
+      });
+    });
+
+
+    // just11
+    describe('when last visitor only check the first and previous visitor only check the first', function(){
+      var payment;
+      before(function(done){
+        var promise = Payment.compute(
+          "just11",
+          numOfDevices
+        );
+        promise.then(function(result){
+          payment = result;
+          done();
+        });
+      });
+      it('Should be valid', function(){
+        payment.should.have.property('isValid', false);
+      });
+    });
+
+    // just61
+    describe('when last visitor only check the first and previous visitor only check the latest', function(){
+      var payment;
+      before(function(done){
+        var promise = Payment.compute(
+          "just61",
+          numOfDevices
+        );
+        promise.then(function(result){
+          payment = result;
+          done();
+        });
+      });
+      it('Should be valid', function(){
+        payment.should.have.property('isValid', false);
+      });
+    });
+
+    // reverse6
+    describe('when visitor only check the latest and previous visitor did reverse checkin', function(){
+      var payment;
+      before(function(done){
+        var promise = Payment.compute(
+          "reverse6",
+          numOfDevices
+        );
+        promise.then(function(result){
+          payment = result;
+          done();
+        });
+      });
+      it('Should be valid', function(){
+        payment.should.have.property('isValid', false);
+      });
+    });
+
+
+    // only666
+    describe('when visitor only check the latest and previous visitor was playing only in the latest', function(){
+      var payment;
+      before(function(done){
+        var promise = Payment.compute(
+          "only666",
+          numOfDevices
+        );
+        promise.then(function(result){
+          payment = result;
+          done();
+        });
+      });
+      it('Should be valid', function(){
+        payment.should.have.property('isValid', false);
+      });
+    });
+
+    // only1only6
+    describe('when visitor only check the latest and previous visitor only in the first', function(){
+      var payment;
+      before(function(done){
+        var promise = Payment.compute(
+          "only1only6",
+          numOfDevices
+        );
+        promise.then(function(result){
+          payment = result;
+          done();
+        });
+      });
+      it('Should be valid', function(){
+        payment.should.have.property('isValid', false);
+      });
+    });
+
+    // only6
+    describe('when visitor only check the latest', function(){
+      var payment;
+      before(function(done){
+        var promise = Payment.compute(
+          "only6",
+          numOfDevices
+        );
+        promise.then(function(result){
+          payment = result;
+          done();
+        });
+      });
+      it('Should be valid', function(){
+        payment.should.have.property('isValid', false);
+      });
+    });
+
+    // noprevactivitycomplete
+    describe('visitor repeating the first after weird previous activity', function(){
+      var payment;
+      var roomExpectation = {
+          timeReport: [
+              { position: 1, timeSpent: { hours: 1, seconds: 4 }, timeSpentInSeconds: 3604 }
+            , { position: 2, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+            , { position: 3, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+            , { position: 4, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+            , { position: 5, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+          ]
+        };
+      before(function(done){
+        var promise = Payment.compute(
+          "noprevactivitycomplete",
+          numOfDevices
+        );
+        promise.then(function(result){
+          payment = result;
+          done();
+        });
+      });
+      it('Should be valid', function(){
+        payment.should.have.property('isValid', true);
+      });
+
+      it('Should be complete', function(){
+        payment.should.have.property('isComplete', true);
+      });
+
+      it('should compute the hours spent by the visitor', function () {
+        payment.should.have.property('workingTime')
+        .that.is.an('object')
+        .that.deep.equals(
+          { years: 0
+          , months: 0
+          , days: 0
+          , hours: 3
+          , minutes : 0
+          , seconds: 12
+          , decimalTime: 3
+          });
+      });
+
+      it('contain the time spent on the rooms', function(){
+        payment.should.containSubset(roomExpectation);
+      });
+
+
+    });
+
+    // drunkvalid
+    describe('when visitor checks twice on first twice on 2nd once in 3rd and then 6th', function(){
+      var payment;
+      before(function(done){
+        var promise = Payment.compute(
+          "drunkvalid",
+          numOfDevices
+        );
+        promise.then(function(result){
+          payment = result;
+          done();
+        });
+      });
+      it('Should be valid', function(){
+        payment.should.have.property('isValid', true);
+      });
+
+      it('Should be complete', function(){
+        payment.should.have.property('isComplete', false);
+      });
+
+      it('should compute the hours spent by the visitor', function () {
+        payment.should.have.property('workingTime')
+        .that.is.an('object')
+        .that.deep.equals(
+          { years: 0
+          , months: 0
+          , days: 0
+          , hours: 4
+          , minutes : 30
+          , seconds: 18
+          , decimalTime: 4.5
+          });
+      });
+    });
+
+
+
+    // pure666valid
+    describe('when visitor checks on the first and repeat on the latest', function(){
+      var payment;
+      before(function(done){
+        var promise = Payment.compute(
+          "pure666valid",
+          numOfDevices
+        );
+        promise.then(function(result){
+          payment = result;
+          done();
+        });
+      });
+      it('Should be valid', function(){
+        payment.should.have.property('isValid', true);
+      });
+
+      it('Should be complete', function(){
+        payment.should.have.property('isComplete', false);
+      });
+
+      it('should compute the hours spent by the visitor', function () {
+        payment.should.have.property('workingTime')
+        .that.is.an('object')
+        .that.deep.equals(
+          { years: 0
+          , months: 0
+          , days: 0
+          , hours: 1
+          , minutes : 30
+          , seconds: 6
+          , decimalTime: 1.5
+          });
+      });
+    });
+
+
+    // double12valid
+    describe('when visitor checks twice on first twice on 2nd once in 3rd and then 6th', function(){
+      var payment;
+      before(function(done){
+        var promise = Payment.compute(
+          "double12valid",
+          numOfDevices
+        );
+        promise.then(function(result){
+          payment = result;
+          done();
+        });
+      });
+      it('Should be valid', function(){
+        payment.should.have.property('isValid', true);
+      });
+
+      it('Should be complete', function(){
+        payment.should.have.property('isComplete', false);
+      });
+
+      it('should compute the hours spent by the visitor', function () {
+        payment.should.have.property('workingTime')
+        .that.is.an('object')
+        .that.deep.equals(
+          { years: 0
+          , months: 0
+          , days: 0
+          , hours: 2
+          , minutes : 30
+          , seconds: 10
+          , decimalTime: 2.5
+          });
+      });
+    });
+
+
+    // onesix3valid
+    describe('a unsure visitor checking several times in the first and several in the last', function(){
+      var payment;
+      before(function(done){
+        var promise = Payment.compute(
+          "onesix3valid",
+          numOfDevices
+        );
+        promise.then(function(result){
+          payment = result;
+          done();
+        });
+      });
+      it('Should be valid', function(){
+        payment.should.have.property('isValid', true);
+      });
+
+      it('Should not be complete', function(){
+        payment.should.have.property('isComplete', false);
+      });
+
+      it('should compute the hours spent by the visitor', function () {
+        payment.should.have.property('workingTime')
+        .that.is.an('object')
+        .that.deep.equals(
+          { years: 0
+          , months: 0
+          , days: 0
+          , hours: 2
+          , minutes : 30
+          , seconds: 10
+          , decimalTime: 2.5
+          });
+      });
+
+    });
+
+    // reversecomplete
+    describe('with the perfect visitor checking in order in all devices but a nasty previous visitor doing all reverse', function(){
+      var payment;
+      var roomExpectation = {
+          timeReport: [
+              { position: 1, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+            , { position: 2, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+            , { position: 3, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+            , { position: 4, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+            , { position: 5, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+          ]
+        };
+      before(function(done){
+        var promise = Payment.compute(
+          "reversecomplete",
+          numOfDevices
+        );
+        promise.then(function(result){
+          payment = result;
+          done();
+        });
+      });
+      it('Should be valid', function(){
+        payment.should.have.property('isValid', true);
+      });
+
+      it('Should be complete', function(){
+        payment.should.have.property('isComplete', true);
+      });
+
+      it('should compute the hours spent by the visitor', function () {
+        payment.should.have.property('workingTime')
+        .that.is.an('object')
+        .that.deep.equals(
+          { years: 0
+          , months: 0
+          , days: 0
+          , hours: 2
+          , minutes : 30
+          , seconds: 10
+          , decimalTime: 2.5
+          });
+      });
+
+      it('contain the time spent on the rooms', function(){
+        payment.should.containSubset(roomExpectation);
+      });
+
+
+    });
+    // nicevisitorcomplete
+    describe('with the perfect visitor checking in order in all devices', function(){
+      var payment;
+      var roomExpectation = {
+          timeReport: [
+              { position: 1, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+            , { position: 2, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+            , { position: 3, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+            , { position: 4, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+            , { position: 5, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+          ]
+        };
+      before(function(done){
+        var promise = Payment.compute(
+          "nicevisitorcomplete",
+          numOfDevices
+        );
+        promise.then(function(result){
+          payment = result;
+          done();
+        });
+      });
+
+      it('Should be valid', function(){
+        payment.should.have.property('isValid', true);
+      });
+
+      it('Should be complete', function(){
+        payment.should.have.property('isComplete', true);
+      });
+
+      it('should compute the hours spent by the visitor', function () {
+        payment.should.have.property('workingTime')
+        .that.is.an('object')
+        .that.deep.equals(
+          { years: 0
+          , months: 0
+          , days: 0
+          , hours: 2
+          , minutes : 30
+          , seconds: 10
+          , decimalTime: 2.5
+          });
+      });
+
+      it('contain the time spent on the rooms', function(){
+        payment.should.containSubset(roomExpectation);
+      });
+
+
+    });
+    // dumbvisitorcomplete
+    describe('with visitors checkin everywhere in order but repeating checkin at some devices', function(){
+      var payment;
+      var roomExpectation = {
+          timeReport: [
+              { position: 1, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+            , { position: 2, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+            , { position: 3, timeSpent: { hours: 1,    seconds: 4 }, timeSpentInSeconds: 3604 }
+            , { position: 4, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+            , { position: 5, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+          ]
+        };
+
+      before(function(done){
+        var promise = Payment.compute(
+          "dumbvisitorcomplete",
+          numOfDevices
+        );
+        promise.then(function(result){
+          payment = result;
+          done();
+        });
+      });
+
+      it('Should be valid', function(){
+        payment.should.have.property('isValid', true);
+      });
+
+      it('Should be complete', function(){
+        payment.should.have.property('isComplete', true);
+      });
+
+      it('should compute the hours spent by the visitor', function () {
+        payment.should.have.property('workingTime')
+        .that.is.an('object')
+        .that.deep.equals(
+          { years: 0
+          , months: 0
+          , days: 0
+          , hours: 3
+          , minutes : 0
+          , seconds: 12
+          , decimalTime: 3
+          });
+
+      });
+
+      it('contain the time spent on the rooms', function(){
+        payment.should.containSubset(roomExpectation);
+      });
+    });
+
   });
 
 

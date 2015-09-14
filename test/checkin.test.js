@@ -5,8 +5,8 @@ var expect = require('expect.js');
 var sinon = require('sinon');
 
 var moment = require('moment');
-var Checking = require('./../lib/operations/checkin.js');
-var models  = require('../models');
+var Checkin = require('./../lib/operations/checkin.js');
+var VisitorTrack  = require('../models').VisitorTrack;
 
 describe('Checkin', function() {
   beforeEach(function () {
@@ -22,9 +22,9 @@ describe('Checkin', function() {
       var checkpoint = {
         position: 4
       }
-      //var spy = sinon.spy(models.VisitorTrack, "create");
-      //Checking.read(checkpoint, 'persist323');
-      //assert(spy.withArgs({cardId:'persist323', position: 4}).calledOnce);
+      var spy = sinon.spy(VisitorTrack, "create");
+      Checkin.read(checkpoint, 'persist323');
+      assert(spy.withArgs({cardId:'persist323', position: 4, createdAt: moment().utc().toDate()}).calledOnce);
     });
 
 

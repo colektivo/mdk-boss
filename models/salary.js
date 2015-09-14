@@ -5,6 +5,8 @@ module.exports = function(sequelize, DataTypes) {
     monthlyIncome: DataTypes.INTEGER,
     text: DataTypes.STRING,
   }, {
+    tableName: 'salaries',
+    underscored: true,
     classMethods: {
       associate: function(models) {
         // associations can be defined here

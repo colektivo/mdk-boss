@@ -5,17 +5,19 @@ var moment = require('moment');
 
 module.exports = function(sequelize, DataTypes) {
   var VisitorTrack = sequelize.define('VisitorTrack', {
-    cardId: DataTypes.STRING,
+    card_id: DataTypes.STRING,
     position: DataTypes.INTEGER,
-    createdAt: {
+    created_at: {
       type: Sequelize.DATE,
     },
-    updatedAt: {
+    updated_at: {
       type: Sequelize.DATE,
       defaultValue: moment().utc().toDate()
     }
   }, {
+    tableName: 'visitor_tracks',
     timestamps: false,
+    underscored: true,
     classMethods: {
       associate: function(models) {
         // associations can be defined here
