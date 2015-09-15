@@ -27,7 +27,7 @@ if (Space.isReady()) {
   });
 
   io.on('connection', function(socket){
-    socket.emit('hello', { message: 'I\'m tracking you...' });
+    socket.emit('init', { message: 'I\'m tracking you...', config: {} });
     var lastPosition = Space.lastPosition();
     var totalDevices = Space._checkpoints.length;
 
