@@ -111,8 +111,9 @@ describe.only('Payment', function() {
       var payment;
       before(function(done){
         var promise = Payment.compute(
-          "check26",
-          numOfDevices
+          "check26"
+          , numOfDevices
+          , '2023-04-03'
         );
         promise.then(function(result){
           payment = result;
@@ -129,8 +130,9 @@ describe.only('Payment', function() {
       var payment;
       before(function(done){
         var promise = Payment.compute(
-          "just33",
-          numOfDevices
+          "just33"
+          , numOfDevices
+          , '2023-04-03'
         );
         promise.then(function(result){
           payment = result;
@@ -149,8 +151,9 @@ describe.only('Payment', function() {
       var payment;
       before(function(done){
         var promise = Payment.compute(
-          "just22",
-          numOfDevices
+          "just22"
+          , numOfDevices
+          , '2023-04-03'
         );
         promise.then(function(result){
           payment = result;
@@ -168,8 +171,9 @@ describe.only('Payment', function() {
       var payment;
       before(function(done){
         var promise = Payment.compute(
-          "just11",
-          numOfDevices
+          "just11"
+          , numOfDevices
+          , '2023-04-03'
         );
         promise.then(function(result){
           payment = result;
@@ -186,8 +190,9 @@ describe.only('Payment', function() {
       var payment;
       before(function(done){
         var promise = Payment.compute(
-          "just61",
-          numOfDevices
+          "just61"
+          , numOfDevices
+          , '2023-04-03'
         );
         promise.then(function(result){
           payment = result;
@@ -204,8 +209,9 @@ describe.only('Payment', function() {
       var payment;
       before(function(done){
         var promise = Payment.compute(
-          "reverse6",
-          numOfDevices
+          "reverse6"
+          , numOfDevices
+          , '2023-04-03'
         );
         promise.then(function(result){
           payment = result;
@@ -223,8 +229,9 @@ describe.only('Payment', function() {
       var payment;
       before(function(done){
         var promise = Payment.compute(
-          "only666",
-          numOfDevices
+          "only666"
+          , numOfDevices
+          , '2023-04-03'
         );
         promise.then(function(result){
           payment = result;
@@ -241,8 +248,9 @@ describe.only('Payment', function() {
       var payment;
       before(function(done){
         var promise = Payment.compute(
-          "only1only6",
-          numOfDevices
+          "only1only6"
+          , numOfDevices
+          , '2023-04-03'
         );
         promise.then(function(result){
           payment = result;
@@ -259,8 +267,9 @@ describe.only('Payment', function() {
       var payment;
       before(function(done){
         var promise = Payment.compute(
-          "only6",
-          numOfDevices
+          "only6"
+          , numOfDevices
+          , '2023-04-03'
         );
         promise.then(function(result){
           payment = result;
@@ -286,8 +295,9 @@ describe.only('Payment', function() {
         };
       before(function(done){
         var promise = Payment.compute(
-          "noprevactivitycomplete",
-          numOfDevices
+          "noprevactivitycomplete"
+          , numOfDevices
+          , '2023-04-03'
         );
         promise.then(function(result){
           payment = result;
@@ -328,8 +338,9 @@ describe.only('Payment', function() {
       var payment;
       before(function(done){
         var promise = Payment.compute(
-          "drunkvalid",
-          numOfDevices
+          "drunkvalid"
+          , numOfDevices
+          , '2023-04-03'
         );
         promise.then(function(result){
           payment = result;
@@ -366,8 +377,9 @@ describe.only('Payment', function() {
       var payment;
       before(function(done){
         var promise = Payment.compute(
-          "pure666valid",
-          numOfDevices
+          "pure666valid"
+          , numOfDevices
+          , '2023-04-03'
         );
         promise.then(function(result){
           payment = result;
@@ -403,8 +415,9 @@ describe.only('Payment', function() {
       var payment;
       before(function(done){
         var promise = Payment.compute(
-          "double12valid",
-          numOfDevices
+          "double12valid"
+          , numOfDevices
+          , '2023-04-03'
         );
         promise.then(function(result){
           payment = result;
@@ -440,8 +453,9 @@ describe.only('Payment', function() {
       var payment;
       before(function(done){
         var promise = Payment.compute(
-          "onesix3valid",
-          numOfDevices
+          "onesix3valid"
+          , numOfDevices
+          , '2023-04-03'
         );
         promise.then(function(result){
           payment = result;
@@ -486,8 +500,9 @@ describe.only('Payment', function() {
         };
       before(function(done){
         var promise = Payment.compute(
-          "reversecomplete",
-          numOfDevices
+          "reversecomplete"
+          , numOfDevices
+          , '2023-04-03'
         );
         promise.then(function(result){
           payment = result;
@@ -536,8 +551,9 @@ describe.only('Payment', function() {
         };
       before(function(done){
         var promise = Payment.compute(
-          "nicevisitorcomplete",
-          numOfDevices
+          "nicevisitorcomplete"
+          , numOfDevices
+          , '2023-04-03'
         );
         promise.then(function(result){
           payment = result;
@@ -588,8 +604,9 @@ describe.only('Payment', function() {
 
       before(function(done){
         var promise = Payment.compute(
-          "dumbvisitorcomplete",
-          numOfDevices
+          "dumbvisitorcomplete"
+          , numOfDevices
+          , '2023-04-03'
         );
         promise.then(function(result){
           payment = result;
