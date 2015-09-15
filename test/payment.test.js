@@ -104,6 +104,19 @@ describe.only('Payment', function() {
   afterEach(function () {
   }),
 
+  describe('#compare', function () {
+    describe('we want to compare the time spent with the salaries of people', function(){
+      describe('when the time is 1 hour', function(){
+        it('should return the list of the salaries by 1 hour', function(){
+          Payment.compare(3600).should.eventually.be.an('array')
+            .with.deep.property('[2]')
+            .that.deep.equals(69);
+        });
+      });
+    });
+
+  });
+
   describe('#compute', function () {
 
     // check26
@@ -276,9 +289,15 @@ describe.only('Payment', function() {
           done();
         });
       });
+
       it('Should be valid', function(){
         payment.should.have.property('isValid', false);
       });
+
+      it('Should include the comparison array of salaries', function(){
+        payment.should.not.have.property('salaries');
+      });
+
     });
 
     // noprevactivitycomplete
@@ -306,6 +325,11 @@ describe.only('Payment', function() {
       });
       it('Should be valid', function(){
         payment.should.have.property('isValid', true);
+      });
+
+      it('Should include the comparison array of salaries', function(){
+        payment.should.have.property('salaries')
+          .that.is.an('array');
       });
 
       it('Should be complete', function(){
@@ -351,6 +375,11 @@ describe.only('Payment', function() {
         payment.should.have.property('isValid', true);
       });
 
+      it('Should include the comparison array of salaries', function(){
+        payment.should.have.property('salaries')
+          .that.is.an('array');
+      });
+
       it('Should be complete', function(){
         payment.should.have.property('isComplete', false);
       });
@@ -388,6 +417,11 @@ describe.only('Payment', function() {
       });
       it('Should be valid', function(){
         payment.should.have.property('isValid', true);
+      });
+
+      it('Should include the comparison array of salaries', function(){
+        payment.should.have.property('salaries')
+          .that.is.an('array');
       });
 
       it('Should be complete', function(){
@@ -428,6 +462,11 @@ describe.only('Payment', function() {
         payment.should.have.property('isValid', true);
       });
 
+      it('Should include the comparison array of salaries', function(){
+        payment.should.have.property('salaries')
+          .that.is.an('array');
+      });
+
       it('Should be complete', function(){
         payment.should.have.property('isComplete', false);
       });
@@ -464,6 +503,11 @@ describe.only('Payment', function() {
       });
       it('Should be valid', function(){
         payment.should.have.property('isValid', true);
+      });
+
+      it('Should include the comparison array of salaries', function(){
+        payment.should.have.property('salaries')
+          .that.is.an('array');
       });
 
       it('Should not be complete', function(){
@@ -511,6 +555,11 @@ describe.only('Payment', function() {
       });
       it('Should be valid', function(){
         payment.should.have.property('isValid', true);
+      });
+
+      it('Should include the comparison array of salaries', function(){
+        payment.should.have.property('salaries')
+          .that.is.an('array');
       });
 
       it('Should be complete', function(){
@@ -565,6 +614,11 @@ describe.only('Payment', function() {
         payment.should.have.property('isValid', true);
       });
 
+      it('Should include the comparison array of salaries', function(){
+        payment.should.have.property('salaries')
+          .that.is.an('array');
+      });
+
       it('Should be complete', function(){
         payment.should.have.property('isComplete', true);
       });
@@ -616,6 +670,11 @@ describe.only('Payment', function() {
 
       it('Should be valid', function(){
         payment.should.have.property('isValid', true);
+      });
+
+      it('Should include the comparison array of salaries', function(){
+        payment.should.have.property('salaries')
+          .that.is.an('array');
       });
 
       it('Should be complete', function(){
