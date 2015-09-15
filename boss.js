@@ -38,7 +38,6 @@ if (Space.isReady()) {
           socket.emit('check', { position: data.checkpoint.position, cardId: data.id } );
           if (data.checkpoint.position == lastPosition) {
             Payment.compute(data.id, totalDevices).then( function(data){
-              socket.emit('completed', { text: 'Gotcha!'} );
               socket.emit('completed', data);
             });
           }
