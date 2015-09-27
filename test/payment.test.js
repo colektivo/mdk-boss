@@ -44,7 +44,6 @@ function createTracks(cardId, startDate , tracksData) {
     for (var j = 0; j < tracksData[i].length; j++) {
       var record = {card_id: cardId, position: tracksData[i][j], created_at: currentTimestamp};
       trackRecords.push(record);
-      console.log(record);
       currentTimestamp = addTimeBetweenDevices(currentTimestamp);
     }
     visitorRecords = visitorRecords.concat(trackRecords);
@@ -55,7 +54,7 @@ function createTracks(cardId, startDate , tracksData) {
 
 var defaultTimestamp = moment([2023, 3, 3, 0, 0, 0, 0]).utc().toDate();
 
-describe.only('Payment', function() {
+describe('Payment', function() {
   var promise;
 
   before(function () {
@@ -97,7 +96,7 @@ describe.only('Payment', function() {
                                   , nicevisitorcomplete
                                   , dumbvisitorcomplete
                                   , noprevactivitycomplete);
-        return models.VisitorTrack.bulkCreate(tracks);
+        return models.VisitorTrack.bulkCreate(tracks, {logging: false});
       });
   }),
 
@@ -108,8 +107,8 @@ describe.only('Payment', function() {
     describe('we want to compare the time spent with the salaries of people', function(){
       describe('when the time is 1 hour', function(){
         it('should return the list of the salaries by 1 hour', function(){
-          Payment.compare(3600).should.eventually.be.an('array')
-            .with.deep.property('[2]')
+          Payment.compare(1).should.eventually.be.an('array')
+            .with.deep.property('[2].payment')
             .that.deep.equals(69);
         });
       });

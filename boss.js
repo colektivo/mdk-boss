@@ -5,58 +5,116 @@ var Device    = require('./lib/device.js');
 var HID       = require('node-hid');
 var Checking  = require('./lib/operations/checkin.js');
 
-var app       = require('express')();
-var http      = require('http').Server(app);
 var io        = require('socket.io')(8001);
-
-var env       = process.env.NODE_ENV || 'development';
-var devices   = require(__dirname + '/config/devices.json')[env];
+//var devices   = Space.readers();
+var devices   = require(__dirname + '/config/devices.json');
+var Payment = require('./lib/representers/payment.js');
 
 /*
 As the devicePath change every time this should be reconfigured everytime, maybe a config file and a setup cli command will be a good idea
 */
 
-var entrance = Space.addCheckpoint(devices.entrance);
-var mid = Space.addCheckpoint(devices.hall);
-var last = Space.addCheckpoint(devices.exit);
-var Payment = require('./lib/representers/payment.js');
 
-if (Space.isReady()) {
-  app.get('/', function(req, res){
-    res.sendFile(__dirname + '/index.html');
-  });
+io.on('connection', function(socket){
 
-  io.on('connection', function(socket){
-    socket.emit('init', { message: 'I\'m tracking you...', config: {} });
-    var lastPosition = Space.lastPosition();
-    var totalDevices = Space._checkpoints.length;
+  socket.on('init', function(data){
+    console.log('init');
+    Space.isValidConfig()
+      .then(function(isValid){
+        console.log('isValid:' + isValid);
+        if (isValid) {
+          Space.config().then(function(config){
+            return Space.say(socket, 'ready to start', config);
+          });
+        } else {
 
-    for (var i = 0; i < totalDevices; i++) {
-      Space._checkpoints[i].reader.on('read', function(data){
-        Checking.read(data.checkpoint, data.id)
-          .then(function(){
-          socket.emit('check', { position: data.checkpoint.position, cardId: data.id } );
-          if (data.checkpoint.position == lastPosition) {
-            Payment.compute(data.id, totalDevices).then( function(data){
-              socket.emit('completed', data);
+          console.log(Space.readers());
+
+          console.log("closing if there are previous connections");
+          Space.disconnect();
+
+          // devices should be added based on config not by defalult
+
+          Space.readers().forEach(function(device){
+            console.log("device to add:" + device.path);
+            Space.addCheckpoint(device, function(data) {
+              // devices empty array is added to leverage the maybe handling on Employee
+              var check = {'readerData': {'devicePath': data.checkpoint.devicePath, 'id': data.id }, 'devices': []};
+              console.log('data:' + JSON.stringify(check));
+              Space.say(socket,'check', check);
             });
-          }
-        });
+          });
+
+          var config = Space.defaultConfig();
+          console.log('config:' + JSON.stringify(config));
+
+          return Space.say(socket, 'configure', config);
+
+        }
       });
-    }
-  });
-
-  http.listen(3000, function(){
-    console.log('listening on *:3000');
-  });
-
-} else {
-  console.log('Your boss is having holidays...');
-  Space._checkpoints.filter(
-    function(element, index){
-      return element.up;
-    }).forEach(
-      function(element, index) {
-        console.log('Device ' + element.devicePath + ' not found');
     });
-}
+
+  socket.on('save config', function (data) {
+    console.log('save config:' + data);
+    Space.saveConfig(JSON.parse(data))
+      .then(function(config){
+        console.log('new config:' + JSON.stringify(config));
+        return Space.say(socket, 'ready to start', config);
+      });
+  });
+
+  socket.on('stop', function (data) {
+    socket.server.close();
+  });
+
+  socket.on('restart', function (data) {
+    var config = Space.defaultConfig();
+    return Space.say(socket, 'configure', config);
+  });
+
+  socket.on('start', function (data) {
+
+    Space.disconnect();
+    Space.config().then(function(config){
+      config.devices.forEach(function(device){
+        // device.device device.path device.devicePath WTF! REFACTOR.ME
+
+        console.log("device to add:" + device.device);
+        Space.addCheckpoint({path: device.device, position: device.position }, function() {});
+
+      });
+      if (Space.isReady()) {
+
+        console.log('space ready');
+
+        var lastPosition = Space.lastPosition();
+        var totalDevices = Space._checkpoints.length;
+
+        console.log('totalDevices:' + totalDevices);
+        console.log('lastPosition:' + lastPosition);
+
+
+        Space.checkpoints().forEach(function(checkpoint){
+          checkpoint.reader.on('read', function(data) {
+            Checking.read(data.checkpoint, data.id)
+              .then(function(){
+                //socket.emit('check', { position: data.checkpoint.position, cardId: data.id } );
+                if (data.checkpoint.position == lastPosition ) {
+                  Payment.compute(data.id, totalDevices).then( function(data) {
+                    console.log('payment   :' + JSON.stringify(data));
+                    return socket.emit('completed', data);
+                  });
+                }
+              });
+            });
+          });
+      } else {
+        return Space.say(socket, 'configure', {});
+      }
+
+    })
+
+ });
+
+
+});

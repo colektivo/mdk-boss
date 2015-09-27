@@ -80,6 +80,11 @@ Open the browser on http://localhost:3000
 
 ### TO DO
 
+* fix isReady is taking wrong data to validate
+* add stats representer
 * namespacing avoiding globals in some cases
 * move from assert to chai to have consistency and nicer readability of the tests
+* decide which to use "devicePath" or "path", currently is mixed and is confusing
 * code review by someone with node experience ;-)
+* fix tests
+* remove console.log

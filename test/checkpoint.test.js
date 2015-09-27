@@ -9,15 +9,15 @@ var HID = require('node-hid');
 
 var sampleDecicesConfig = {
   "entrance": {
-    "devicePath": "USB_08ff_0009_14541000",
+    "path": "USB_08ff_0009_14541000",
     "position": 1
   },
   "hall": {
-    "devicePath": "USB_08ff_0009_14541700",
+    "path": "USB_08ff_0009_14541700",
     "position": 2
   },
   "exit": {
-    "devicePath": "USB_08ff_0009_14541400",
+    "path": "USB_08ff_0009_14541400",
     "position": 3
   }
 };
@@ -30,7 +30,7 @@ describe('Checkpoint', function () {
   describe("#new", function () {
     it("should remember devicePath", function () {
       var checkpoint = new Checkpoint(sampleDecicesConfig.entrance);
-      assert.equal(sampleDecicesConfig.entrance.devicePath, checkpoint.devicePath);
+      assert.equal(sampleDecicesConfig.entrance.path, checkpoint.devicePath);
     });
     it("should remember the position", function () {
       var checkpoint = new Checkpoint(sampleDecicesConfig.hall);
