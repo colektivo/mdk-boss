@@ -78,7 +78,6 @@ io.on('connection', function(socket){
     Space.config().then(function(config){
       config.devices.forEach(function(device){
         // device.device device.path device.devicePath WTF! REFACTOR.ME
-
         console.log("device to add:" + device.device);
         Space.addCheckpoint({path: device.device, position: device.position }, function() {});
 
@@ -86,6 +85,7 @@ io.on('connection', function(socket){
       if (Space.isReady()) {
 
         console.log('space ready');
+        Space.say(socket, 'start tracking', config);
 
         var lastPosition = Space.lastPosition();
         var totalDevices = Space._checkpoints.length;
