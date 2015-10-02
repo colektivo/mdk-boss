@@ -72,7 +72,9 @@ io.on('connection', function(socket){
 
   socket.on('restart', function (data) {
     var config = Space.defaultConfig();
-    return Space.say(socket, 'configure', config);
+    Space.saveConfig(config).then(function(config){
+      return Space.say(socket, 'configure', config);
+    });
   });
 
   socket.on('start', function (data) {
