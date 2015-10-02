@@ -301,14 +301,15 @@ describe('Payment', function() {
 
     // noprevactivitycomplete
     describe('visitor repeating the first after weird previous activity', function(){
+      console.log(defaultTimestamp);
       var payment;
       var roomExpectation = {
           timeReport: [
-              { position: 1, timeSpent: { hours: 1, seconds: 4 }, timeSpentInSeconds: 3604 }
-            , { position: 2, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
-            , { position: 3, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
-            , { position: 4, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
-            , { position: 5, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802 }
+              { position: 1, timeSpent: { hours: 1, seconds: 4 }, timeSpentInSeconds: 3604, happened: moment('2023-04-03 05:00:04 Z').toDate() }
+            , { position: 2, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802, happened: moment('2023-04-03 06:00:08 Z').toDate() }
+            , { position: 3, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802, happened: moment('2023-04-03 06:30:10 Z').toDate() }
+            , { position: 4, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802, happened: moment('2023-04-03 07:00:12 Z').toDate() }
+            , { position: 5, timeSpent: { minutes: 30, seconds: 2 }, timeSpentInSeconds: 1802, happened: moment('2023-04-03 07:30:14 Z').toDate() }
           ]
         };
       before(function(done){
@@ -353,6 +354,18 @@ describe('Payment', function() {
         payment.should.containSubset(roomExpectation);
       });
 
+      it('should specify when the checks happened', function(){
+        payment.timeReport.map(function(element) {
+          return element.happened;
+        }).should.eql(roomExpectation.timeReport.map(function(element){
+          return element.happened;
+        }));
+      });
+
+      it('should include the stats', function(){
+        payment.should.have.property('stats')
+          .that.is.an('array');
+      })
 
     });
 
@@ -701,6 +714,7 @@ describe('Payment', function() {
     });
 
   });
+
 
 
 });

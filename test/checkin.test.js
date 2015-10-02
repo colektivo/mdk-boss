@@ -1,19 +1,27 @@
 'use strict'
 
-var assert = require("assert");
-var expect = require('expect.js');
-var sinon = require('sinon');
+var chai = require('chai')
+  , expect = chai.expect
+  , should = chai.should()
+  , sinon = require('sinon')
+  , moment = require('moment')
+  , Sequelize = require('sequelize')
+  , Promise = Sequelize.Promise;
 
-var moment = require('moment');
+sinon.assert.expose(chai.assert, { prefix: "" });
+
 var Checkin = require('./../lib/operations/checkin.js');
-var VisitorTrack  = require('../models').VisitorTrack;
+var models  = require('../models');
 
 describe('Checkin', function() {
+  var spy;
   beforeEach(function () {
     this.clock = sinon.useFakeTimers(new Date(2014,8,1,10,1,1,0).getTime());
+    spy = sinon.spy(models.VisitorTrack, "create");
   }),
 
   afterEach(function () {
+    models.VisitorTrack.create.restore();
     this.clock.restore();
   }),
   describe('#new', function () {
@@ -22,9 +30,8 @@ describe('Checkin', function() {
       var checkpoint = {
         position: 4
       }
-      var spy = sinon.spy(VisitorTrack, "create");
       Checkin.read(checkpoint, 'persist323');
-      assert(spy.withArgs({cardId:'persist323', position: 4, createdAt: moment().utc().toDate()}).calledOnce);
+      sinon.assert.calledWith(spy, {card_id:'persist323', position: 4, created_at: moment().utc().toDate()} );
     });
 
 

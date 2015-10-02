@@ -24,7 +24,8 @@
     "sinon": "^1.16.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "sudo node boss.js",
+    "test": "sudo NODE_ENV=test mocha"
   },
   "keywords": [
     "hid"

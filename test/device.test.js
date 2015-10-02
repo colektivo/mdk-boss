@@ -1,8 +1,14 @@
 'use strict'
 
-var assert = require("assert");
-var expect = require('expect.js');
-var sinon = require('sinon');
+var chai = require('chai')
+  , expect = chai.expect
+  , should = chai.should()
+  , sinon = require('sinon')
+  , moment = require('moment')
+  , Sequelize = require('sequelize')
+  , Promise = Sequelize.Promise;
+
+sinon.assert.expose(chai.assert, { prefix: "" });
 
 var Device = require('./../lib/device.js');
 var Checkpoint = require('./../lib/checkpoint.js');
@@ -87,10 +93,15 @@ describe('Device', function () {
       bufferListCard1.map(function(element, index ) {
         result = device.capture(element, checkpoint );
       });
-      assert(spy.calledWith({
+      // assert(spy.calledWith({
+      //   checkpoint: checkpoint,
+      //   id: result},
+      //   { for: 'everyone' }));
+      sinon.assert.calledWith(spy, {
         checkpoint: checkpoint,
         id: result},
-        { for: 'everyone' }));
+        { for: 'everyone' });
+
     });
   });
 
@@ -102,21 +113,21 @@ describe('Device', function () {
       bufferListCard1.map(function(element, index ) {
         result = device.capture(element, checkpoint );
       });
-      assert.equal('2543714507', result);
+      result.should.equal('2543714507');
 
       var checkpoint = new Checkpoint({slug: 'mid', devicePath: 'USB_08ff_0009_14541400', position: 2});
       bufferListCard2.map(function(element, index ) {
         result = device.capture(element, checkpoint);
       });
-      assert.equal('3504675323', result);
+      result.should.equal('3504675323');
     });
   });
 
   describe('#decode()', function () {
     it('should return the decoded Card id from captured array from reader', function () {
       var device = new Device();
-      assert.equal('2543714507',device.decode([ 31, 0, 34, 0, 33, 0, 32, 0, 36, 0, 30, 0, 33, 0, 34, 0, 39, 0, 36, 0, 40, 0 ]));
-      assert.equal('3504675323',device.decode([ 32, 0, 34, 0, 39, 0, 33, 0, 35, 0, 36, 0, 34, 0, 32, 0, 31, 0, 32, 0, 40, 0 ]));
+      device.decode([ 31, 0, 34, 0, 33, 0, 32, 0, 36, 0, 30, 0, 33, 0, 34, 0, 39, 0, 36, 0, 40, 0 ]).should.equal('2543714507');
+      device.decode([ 32, 0, 34, 0, 39, 0, 33, 0, 35, 0, 36, 0, 34, 0, 32, 0, 31, 0, 32, 0, 40, 0 ]).should.equal('3504675323');
     });
   });
 });

@@ -1,8 +1,13 @@
 'use strict'
 
-var assert = require("assert");
-var expect = require('expect.js');
-var sinon = require('sinon');
+var chai = require('chai')
+  , expect = chai.expect
+  , should = chai.should()
+  , sinon = require('sinon')
+  , moment = require('moment')
+  , Sequelize = require('sequelize')
+  , Promise = Sequelize.Promise;
+
 
 var Checkpoint = require('./../lib/checkpoint.js');
 var HID = require('node-hid');
@@ -30,11 +35,11 @@ describe('Checkpoint', function () {
   describe("#new", function () {
     it("should remember devicePath", function () {
       var checkpoint = new Checkpoint(sampleDecicesConfig.entrance);
-      assert.equal(sampleDecicesConfig.entrance.path, checkpoint.devicePath);
+      checkpoint.devicePath.should.equal(sampleDecicesConfig.entrance.path);
     });
     it("should remember the position", function () {
       var checkpoint = new Checkpoint(sampleDecicesConfig.hall);
-      assert.equal(2, checkpoint.position);
+      checkpoint.position.should.equal(2);
     });
   });
 });

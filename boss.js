@@ -4,16 +4,19 @@ var Space     = require('./lib/space.js');
 var Device    = require('./lib/device.js');
 var HID       = require('node-hid');
 var Checking  = require('./lib/operations/checkin.js');
+var Kapitalismus  = require('./lib/kapitalismus.js');
 
 var io        = require('socket.io')(8001);
 //var devices   = Space.readers();
 var devices   = require(__dirname + '/config/devices.json');
 var Payment = require('./lib/representers/payment.js');
+var VisitorComputation = require('./lib/operations/visitorComputation.js');
 
 /*
 As the devicePath change every time this should be reconfigured everytime, maybe a config file and a setup cli command will be a good idea
 */
 
+console.log(Kapitalismus());
 
 io.on('connection', function(socket){
 
@@ -102,6 +105,7 @@ io.on('connection', function(socket){
                 if (data.checkpoint.position == lastPosition ) {
                   Payment.compute(data.id, totalDevices).then( function(data) {
                     console.log('payment   :' + JSON.stringify(data));
+                    VisitorComputation.validateAndStore(data);
                     return socket.emit('completed', data);
                   });
                 }

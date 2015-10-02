@@ -146,9 +146,9 @@ var device1 = 'TEST_08ff_0009_14541200';
 var device2 = 'TEST_08ff_0009_14541400';
 var device3 = 'TEST_08ff_0009_14541300';
 
-var defaultConfig = [ { device: device1, position: 1 }
-                    , { device: device2, position: 2 }
-                    , { device: device3, position: 3 }
+var defaultConfig = [ { device: device1, position: 0 }
+                    , { device: device2, position: 0 }
+                    , { device: device3, position: 0 }
                     ]
 
 // end fixture data
@@ -267,9 +267,9 @@ describe('Space', function () {
         });
         beforeEach(function(){
           sinon.stub(Space, 'readers').returns([
-              {device: 'A', position: 3}
-            , {device: 'B', position: 1}
-            , {device: 'C', position: 2}
+              {path: 'A', position: 3}
+            , {path: 'B', position: 1}
+            , {path: 'C', position: 2}
           ]);
           sinon.stub(Space,'config').returns(validConfig);
         });
