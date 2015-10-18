@@ -24,8 +24,7 @@
     "sinon": "^1.16.1"
   },
   "scripts": {
-    "start": "sudo node newBoss.js",
-    "devices": "sudo node devices.js",
+    "start": "node newBoss.js",
     "test": "sudo NODE_ENV=test mocha"
   },
   "keywords": [
