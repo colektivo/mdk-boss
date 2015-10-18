@@ -27,10 +27,7 @@ describe('Checkin', function() {
   describe('#new', function () {
 
     it('should persist the visitorTrack', function () {
-      var checkpoint = {
-        position: 4
-      }
-      Checkin.read(checkpoint, 'persist323');
+      Checkin.read(4, 'persist323');
       sinon.assert.calledWith(spy, {card_id:'persist323', position: 4, created_at: moment().utc().toDate()} );
     });
 

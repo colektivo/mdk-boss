@@ -2,14 +2,14 @@
   "name": "mdk-boss",
   "version": "1.0.0",
   "description": "Use HID to access card readers and track the card reading into a db",
-  "main": "boss.js",
+  "main": "newBoss.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "express": "^4.10.2",
+    "express": "^4.13.3",
     "moment": "^2.10.6",
-    "node-hid": "^0.4.0",
+    "node-hid": "git+https://github.com/lorenc-tomasz/node-hid.git#package",
     "pg": "^4.4.1",
     "pg-hstore": "^2.3.2",
     "sequelize": "^3.6.0",
@@ -24,7 +24,8 @@
     "sinon": "^1.16.1"
   },
   "scripts": {
-    "start": "sudo node boss.js",
+    "start": "sudo node newBoss.js",
+    "devices": "sudo node devices.js",
     "test": "sudo NODE_ENV=test mocha"
   },
   "keywords": [

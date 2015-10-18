@@ -67,10 +67,10 @@ describe('Stats',function(){
         Stats.compute().should.eventually.have.deep.property("[0].position", 0);
       });
       it('should have the computed average', function(){
-        Stats.compute().should.eventually.have.deep.property("[0].averageTimeSpent", '3000');
+        Stats.compute().should.eventually.have.deep.property("[0].averageTimeSpent", 3000);
       });
       it('should have the computed average', function(){
-        Stats.compute().should.eventually.have.deep.property("[0].records", '4');
+        Stats.compute().should.eventually.have.deep.property("[0].records", 4);
       });
     });
 
@@ -79,10 +79,10 @@ describe('Stats',function(){
         Stats.compute().should.eventually.have.deep.property("[3].position", 3);
       });
       it('should have the computed average', function(){
-        Stats.compute().should.eventually.have.deep.property("[3].averageTimeSpent", '750');
+        Stats.compute().should.eventually.have.deep.property("[3].averageTimeSpent", 750);
       });
       it('should have the computed average', function(){
-        Stats.compute().should.eventually.have.deep.property("[3].records", '2');
+        Stats.compute().should.eventually.have.deep.property("[3].records", 2);
       });
     });
 

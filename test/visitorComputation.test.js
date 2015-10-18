@@ -66,7 +66,7 @@ var invalidResult = { happened: startedHappening
                           , timeReport: timeCompleteReport
                     };
 
-describe.only('storing time tracked',function(){
+describe('storing time tracked',function(){
   describe('#validateAndstore', function(){
 
     var spy;

@@ -158,14 +158,15 @@ describe('Space', function () {
   describe('configuration', function(){
 
     beforeEach(function () {
-      Space._checkpoints = [];
-      sinon.stub(HID,'HID');
-      sinon.stub(HID,'devices').returns(sampleDevices);
+      Space.checkpoints = [];
+      Space.setDevices([ device1
+                       , device2
+                       , device3
+                      ]);
     });
 
     afterEach(function () {
-      HID.devices.restore();
-      HID.HID.restore();
+      Space.setDevices([]);
     });
 
     describe('#defaultConfig', function(){
@@ -200,23 +201,23 @@ describe('Space', function () {
 
       describe('with a list of devices', function(){
         beforeEach(function(){
-          sinon.stub(Space, 'readers').returns([
-              {path: 'A', position: 3}
-            , {path: 'B', position: 1}
-            , {path: 'C', position: 2}
-          ]);
+          Space.setDevices([ device1
+                           , device2
+                           , device3
+                          ]);
+
         });
         afterEach(function(){
-          Space.readers.restore();
+          Space.setDevices([]);
         });
 
         describe('with a existing device', function(){
           it('should return true', function(){
-            Space.isValidDevice({device: "A", position: 1}).should.be.true;
+            Space.isValidDevice({device: device1, position: 0}).should.be.true;
           });
         });
         describe('with a non existing device', function(){
-          it('should return true', function(){
+          it('should return false', function(){
             Space.isValidDevice({device: "Z", position: 1}).should.be.false;
           });
         });
@@ -226,11 +227,16 @@ describe('Space', function () {
     });
 
     describe('#isValidPosition', function(){
+
       beforeEach(function(){
-        sinon.stub(Space, 'readers').returns([1,2,3,4,5,6,7,8,9,10]);
+        Space.setDevices([ device1
+                         , device2
+                         , device3
+                        ]);
       });
+
       afterEach(function(){
-        Space.readers.restore();
+                  Space.setDevices([]);
       });
 
       describe('with a position value a less than 1 number', function(){
@@ -247,7 +253,7 @@ describe('Space', function () {
 
       describe('with a position value in the range 1 - num of devices', function(){
         it('should return true', function(){
-          Space.isValidPosition({device: "X", position: 10}).should.be.true;
+          Space.isValidPosition({device: "X", position: 3}).should.be.true;
         });
       });
 
@@ -266,15 +272,10 @@ describe('Space', function () {
           });
         });
         beforeEach(function(){
-          sinon.stub(Space, 'readers').returns([
-              {path: 'A', position: 3}
-            , {path: 'B', position: 1}
-            , {path: 'C', position: 2}
-          ]);
+          Space.setDevices([ "A", "B", "C" ]);
           sinon.stub(Space,'config').returns(validConfig);
         });
         afterEach(function(){
-          Space.readers.restore();
           Space.config.restore();
         });
         it('should return true', function(){
@@ -294,7 +295,7 @@ describe('Space', function () {
           });
         });
         beforeEach(function(){
-          sinon.stub(Space, 'readers').returns([
+          Space.setDevices([
               {device: 'A', position: 3}
             , {device: 'B', position: 1}
             , {device: 'C', position: 2}
@@ -302,7 +303,6 @@ describe('Space', function () {
           sinon.stub(Space,'config').returns(validConfig);
         });
         afterEach(function(){
-          Space.readers.restore();
           Space.config.restore();
         });
 
@@ -376,111 +376,45 @@ describe('Space', function () {
 
   describe('setup',function(){
     beforeEach(function () {
-      Space._checkpoints = [];
-      sinon.stub(HID,'HID');
-      sinon.stub(HID,'devices').returns(sampleDevices);
+      Space.checkpoints = [];
+      Space.setDevices([ device1
+                       , device2
+                       , device3
+                      ]);
     });
 
     afterEach(function () {
-      HID.devices.restore();
-      HID.HID.restore();
+      Space.setDevices([]);
     });
     describe('#checkpoints', function () {
       it('should return the list of checkpoints', function () {
-        expect(Space.checkpoints()).to.eql([]);
+        expect(Space.checkpoints).to.eql([]);
       });
     });
 
     describe('#addCheckpoint', function () {
       it('should add a new checkpoint', function () {
 
-        var hid1 = { on: function (event, callback) {}};
-        var hid2 = { on: function (event, callback) {}};
-
-        HID.HID.withArgs('USB_08ff_0009_14541300').returns(hid1);
-        HID.HID.withArgs('USB_08ff_0009_14541400').returns(hid2);
-
         Space.addCheckpoint(sampleDecicesConfig.entrance, function(data){} );
         Space.addCheckpoint(sampleDecicesConfig.exit, function(data){} );
-        expect(Space.checkpoints()).to.have.length(2);
+        expect(Space.checkpoints).to.have.length(2);
 
       });
     });
 
-    describe('#disconnect', function () {
+    describe('#lastDevice', function () {
 
-      beforeEach(function(){
-        sinon.stub(Space, 'readers').returns([
-            {path: 'A', position: 1}
-          , {path: 'B', position: 2}
-        ]);
-      });
-      afterEach(function(){
-        Space.readers.restore();
-      });
+      it('should know the last device on the space', function () {
 
-      it('should remove all the checkpoints and close the device connection', function () {
-        var hid1 = { path: 'A', close: function() {}, on: function (event, callback) {}};
-        var hid2 = { path: 'B', close: function() {}, on: function (event, callback) {}};
-        HID.HID.withArgs('A').returns(hid1);
-        HID.HID.withArgs('B').returns(hid2);
-        Space.addCheckpoint({ path: 'A', position: 1}, function(data){});
-        Space.addCheckpoint({ path: 'B', position: 2}, function(data){});
-        Space.disconnect();
-        expect(Space.checkpoints()).to.have.length(0);
+        var config = { devices: [
+                                { device: device1, position: 3 }
+                              , { device: device2, position: 1 }
+                              , { device: device3, position: 2 }
+        ]}
+
+        expect(Space.lastDevice(config)).to.eql(device1);
 
       });
-    });
-
-
-    describe('#lastPosition', function () {
-
-      it('should know the last position on the space', function () {
-        var hid1 = { on: function (event, callback) {}};
-        var hid2 = { on: function (event, callback) {}};
-        var hid3 = { on: function (event, callback) {}};
-
-        HID.HID.withArgs('TEST_08ff_0009_14541300').returns(hid1);
-        HID.HID.withArgs('TEST_08ff_0009_14541700').returns(hid2);
-        HID.HID.withArgs('TEST_08ff_0009_14541400').returns(hid3);
-
-        Space.addCheckpoint(sampleDecicesConfig.entrance);
-        Space.addCheckpoint(sampleDecicesConfig.hall);
-        Space.addCheckpoint(sampleDecicesConfig.exit);
-
-        expect(Space.lastPosition()).to.eql(3);
-
-      });
-    });
-
-    describe('#isReady', function () {
-
-      it('should know if its ready to start', function () {
-        var hid1 = { on: function (event, callback) {}};
-        var hid2 = { on: function (event, callback) {}};
-
-        HID.HID.withArgs('USB_08ff_0009_14541300').returns(hid1);
-        HID.HID.withArgs('USB_08ff_0009_14541400').returns(hid2);
-
-        Space.addCheckpoint(sampleDecicesConfig.entrance);
-        Space.addCheckpoint(sampleDecicesConfig.exit);
-
-        //expect(Space.checkpoints()).to.have.length(2);
-        Space.isReady().should.be.false;
-      });
-      it('should add failed checkpoints with up false', function () {
-        var hid1 = { on: function (event, callback) {}};
-        var hid2 = { on: function (event, callback) {}};
-
-        HID.HID.withArgs('USB_08ff_0009_14541300').returns(hid1);
-        HID.HID.withArgs('USB_08ff_0009_14541400').returns(hid2);
-
-        Space.addCheckpoint(sampleDecicesConfig.entrance);
-        Space.addCheckpoint(sampleDecicesConfig.exit);
-
-        expect(Space.checkpoints()).to.have.length(2);
-      });
-
     });
 
   });

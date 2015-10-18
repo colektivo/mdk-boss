@@ -12,7 +12,6 @@ sinon.assert.expose(chai.assert, { prefix: "" });
 
 var Device = require('./../lib/device.js');
 var Checkpoint = require('./../lib/checkpoint.js');
-var HID = require('node-hid');
 
 // Fixture data, should be located in other file.
 
@@ -88,17 +87,16 @@ describe('Device', function () {
       var result;
       var device = new Device();
       var spy = sinon.spy();
-      var checkpoint = new Checkpoint({slug: 'entrance', devicePath: 'USB_08ff_0009_14541300', position: 1});
       device.on('read', spy);
       bufferListCard1.map(function(element, index ) {
-        result = device.capture(element, checkpoint );
+        result = device.capture(element, "device1" );
       });
       // assert(spy.calledWith({
       //   checkpoint: checkpoint,
       //   id: result},
       //   { for: 'everyone' }));
       sinon.assert.calledWith(spy, {
-        checkpoint: checkpoint,
+        device: "device1",
         id: result},
         { for: 'everyone' });
 
