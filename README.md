@@ -13,8 +13,8 @@ mdk-police devices.
 
 ## The other apps
 
-[mdk-police] (https://github.com/colektivo/mdk-police "App responsible to capture all the USB readers input")
-[mdk-employee] (https://github.com/colektivo/mdk-employee "App responsible to show the time tracking information on a touch screen")
+* [mdk-police] (https://github.com/colektivo/mdk-police "App responsible to capture all the USB readers input")
+* [mdk-employee] (https://github.com/colektivo/mdk-employee "App responsible to show the time tracking information on a touch screen")
 
 ### Requirements
 
