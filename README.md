@@ -13,7 +13,7 @@ mdk-police devices.
 
 ### Requirements
 
-node.js v0.8 (maybe node legacy)
+node.js v0.8 or later
 libudev-dev (Linux only)
 libusb-1.0-0-dev (Ubuntu versions missing libusb.h only)
 git
