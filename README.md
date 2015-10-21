@@ -11,7 +11,7 @@ mdk-police devices.
 
 ![MDK Time Tracking architecture] (https://github.com/colektivo/mdk-employee/blob/master/docs/infographic/infographic.001.jpg?raw=true "MDK Time Tracking architecture")
 
-## The other apps
+### The other apps
 
 * [mdk-police] (https://github.com/colektivo/mdk-police "App responsible to capture all the USB readers input")
 * [mdk-employee] (https://github.com/colektivo/mdk-employee "App responsible to show the time tracking information on a touch screen")
